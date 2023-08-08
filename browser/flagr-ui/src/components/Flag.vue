@@ -332,204 +332,204 @@
                   </div>
                 </div>
                 <div class="segments-container-inner" v-if="flag.segments.length">
-                  <draggable v-model="flag.segments" @start="drag = true" @end="drag = false">
-                    <transition-group>
-                      <el-card
-                        shadow="hover"
-                        v-for="segment in flag.segments"
-                        :key="segment.id"
-                        class="segment grabbable"
-                      >
-                        <div class="flex-row id-row">
-                          <div class="flex-row-left">
-                            <el-tag type="primary" :disable-transitions="true">
-                              Segment ID:
-                              <b>{{ segment.id }}</b>
-                            </el-tag>
-                          </div>
-                          <div class="flex-row-right">
-                            <el-button
-                              slot="append"
-                              size="small"
-                              @click="putSegment(segment)"
-                            >Save Segment Setting</el-button>
-                            <el-button @click="deleteSegment(segment)" size="small">
-                              <span class="el-icon-delete" />
-                            </el-button>
-                          </div>
+                  <el-card
+                    shadow="hover"
+                    v-for="segment in flag.segments"
+                    :key="segment.id"
+                    class="segment grabbable"
+                  >
+                    <div class="flex-row id-row">
+                      <div class="flex-row-left">
+                        <div class="flex-row-left">
+                          <button @click="segmentUp(segment, flag.segments)">Up</button>
+                          <button @click="segmentDown(segment, flag.segments)">Down</button>
                         </div>
-                        <el-row :gutter="10" class="id-row">
-                          <el-col :span="15">
-                            <el-input
-                              size="small"
-                              placeholder="Description"
-                              v-model="segment.description"
-                            >
-                              <template slot="prepend">Description</template>
-                            </el-input>
-                          </el-col>
-                          <el-col :span="9">
-                            <el-input
-                              class="segment-rollout-percent"
-                              size="small"
-                              placeholder="0"
-                              v-model="segment.rolloutPercent"
-                              :min="0"
-                              :max="100"
-                            >
-                              <template slot="prepend">Rollout</template>
-                              <template slot="append">%</template>
-                            </el-input>
-                          </el-col>
-                        </el-row>
-                        <el-row>
-                          <el-col :span="24">
-                            <h5>Constraints (match ALL of them)</h5>
-                            <div class="constraints">
-                              <div class="constraints-inner" v-if="segment.constraints.length">
-                                <div v-for="constraint in segment.constraints" :key="constraint.id">
-                                  <el-row :gutter="3" class="segment-constraint">
-                                    <el-col :span="20">
-                                      <el-input
-                                        size="small"
-                                        placeholder="Property"
-                                        v-model="constraint.property"
-                                      >
-                                        <template slot="prepend">Property</template>
-                                      </el-input>
-                                    </el-col>
-                                    <el-col :span="4">
-                                      <el-select
-                                        class="width--full"
-                                        size="small"
-                                        v-model="constraint.operator"
-                                        placeholder="operator"
-                                      >
-                                        <el-option
-                                          v-for="item in operatorOptions"
-                                          :key="item.value"
-                                          :label="item.label"
-                                          :value="item.value"
-                                        ></el-option>
-                                      </el-select>
-                                    </el-col>
-                                    <el-col :span="20">
-                                      <el-input size="small" v-model="constraint.value">
-                                        <template slot="prepend">Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</template>
-                                      </el-input>
-                                    </el-col>
-                                    <el-col :span="2">
-                                      <el-button
-                                        type="success"
-                                        plain
-                                        class="width--full"
-                                        @click="
-                                          putConstraint(segment, constraint)
-                                        "
-                                        size="small"
-                                      >Save</el-button>
-                                    </el-col>
-                                    <el-col :span="2">
-                                      <el-button
-                                        type="danger"
-                                        plain
-                                        class="width--full"
-                                        @click="
-                                          deleteConstraint(segment, constraint)
-                                        "
-                                        size="small"
-                                      >
-                                        <i class="el-icon-delete"></i>
-                                      </el-button>
-                                    </el-col>
-                                  </el-row>
-                                </div>
-                              </div>
-                              <div class="card--empty" v-else>
-                                <span>No constraints (ALL will pass)</span>
-                              </div>
-                              <div>
-                                <el-row :gutter="3">
-                                  <el-col :span="5">
-                                    <el-input
-                                      size="small"
-                                      placeholder="Property"
-                                      v-model="segment.newConstraint.property"
-                                    ></el-input>
-                                  </el-col>
-                                  <el-col :span="4">
-                                    <el-select
-                                      size="small"
-                                      v-model="segment.newConstraint.operator"
-                                      placeholder="operator"
-                                    >
-                                      <el-option
-                                        v-for="item in operatorOptions"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value"
-                                      ></el-option>
-                                    </el-select>
-                                  </el-col>
-                                  <el-col :span="11">
-                                    <el-input size="small" v-model="segment.newConstraint.value"></el-input>
-                                  </el-col>
-                                  <el-col :span="4">
-                                    <el-button
-                                      class="width--full"
-                                      size="small"
-                                      type="primary"
-                                      plain
-                                      :disabled="
-                                        !segment.newConstraint.property ||
-                                        !segment.newConstraint.value
-                                      "
-                                      @click.prevent="
-                                        () => createConstraint(segment)
-                                      "
-                                    >Add Constraint</el-button>
-                                  </el-col>
-                                </el-row>
-                              </div>
+                        <el-tag type="primary" :disable-transitions="true">
+                          Segment ID:
+                          <b>{{ segment.id }}</b>
+                        </el-tag>
+                      </div>
+                      <div class="flex-row-right">
+                        <el-button
+                          slot="append"
+                          size="small"
+                          @click="putSegment(segment)"
+                        >Save Segment Setting</el-button>
+                        <el-button @click="deleteSegment(segment)" size="small">
+                          <span class="el-icon-delete" />
+                        </el-button>
+                      </div>
+                    </div>
+                    <el-row :gutter="10" class="id-row">
+                      <el-col :span="15">
+                        <el-input
+                          size="small"
+                          placeholder="Description"
+                          v-model="segment.description"
+                        >
+                          <template slot="prepend">Description</template>
+                        </el-input>
+                      </el-col>
+                      <el-col :span="9">
+                        <el-input
+                          class="segment-rollout-percent"
+                          size="small"
+                          placeholder="0"
+                          v-model="segment.rolloutPercent"
+                          :min="0"
+                          :max="100"
+                        >
+                          <template slot="prepend">Rollout</template>
+                          <template slot="append">%</template>
+                        </el-input>
+                      </el-col>
+                    </el-row>
+                    <el-row>
+                      <el-col :span="24">
+                        <h5>Constraints (match ALL of them)</h5>
+                        <div class="constraints">
+                          <div class="constraints-inner" v-if="segment.constraints.length">
+                            <div v-for="constraint in segment.constraints" :key="constraint.id">
+                              <el-row :gutter="3" class="segment-constraint">
+                                <el-col :span="20">
+                                  <el-input
+                                    size="small"
+                                    placeholder="Property"
+                                    v-model="constraint.property"
+                                  >
+                                    <template slot="prepend">Property</template>
+                                  </el-input>
+                                </el-col>
+                                <el-col :span="4">
+                                  <el-select
+                                    class="width--full"
+                                    size="small"
+                                    v-model="constraint.operator"
+                                    placeholder="operator"
+                                  >
+                                    <el-option
+                                      v-for="item in operatorOptions"
+                                      :key="item.value"
+                                      :label="item.label"
+                                      :value="item.value"
+                                    ></el-option>
+                                  </el-select>
+                                </el-col>
+                                <el-col :span="20">
+                                  <el-input size="small" v-model="constraint.value">
+                                    <template slot="prepend">Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</template>
+                                  </el-input>
+                                </el-col>
+                                <el-col :span="2">
+                                  <el-button
+                                    type="success"
+                                    plain
+                                    class="width--full"
+                                    @click="
+                                      putConstraint(segment, constraint)
+                                    "
+                                    size="small"
+                                  >Save</el-button>
+                                </el-col>
+                                <el-col :span="2">
+                                  <el-button
+                                    type="danger"
+                                    plain
+                                    class="width--full"
+                                    @click="
+                                      deleteConstraint(segment, constraint)
+                                    "
+                                    size="small"
+                                  >
+                                    <i class="el-icon-delete"></i>
+                                  </el-button>
+                                </el-col>
+                              </el-row>
                             </div>
-                          </el-col>
-                          <el-col :span="24" class="segment-distributions">
-                            <h5>
-                              <span>Distribution</span>
-                              <el-button round size="mini" @click="editDistribution(segment)">
-                                <span class="el-icon-edit"></span> edit
-                              </el-button>
-                            </h5>
-                            <el-row type="flex" v-if="segment.distributions.length" :gutter="20">
-                              <el-col
-                                v-for="distribution in segment.distributions"
-                                :key="distribution.id"
-                                :span="6"
-                              >
-                                <el-card shadow="never" class="distribution-card">
-                                  <div>
-                                    <span size="small">
-                                      {{
-                                      distribution.variantKey
-                                      }}
-                                    </span>
-                                  </div>
-                                  <el-progress
-                                    type="circle"
-                                    color="#74E5E0"
-                                    :width="70"
-                                    :percentage="distribution.percent"
-                                  ></el-progress>
-                                </el-card>
+                          </div>
+                          <div class="card--empty" v-else>
+                            <span>No constraints (ALL will pass)</span>
+                          </div>
+                          <div>
+                            <el-row :gutter="3">
+                              <el-col :span="5">
+                                <el-input
+                                  size="small"
+                                  placeholder="Property"
+                                  v-model="segment.newConstraint.property"
+                                ></el-input>
+                              </el-col>
+                              <el-col :span="4">
+                                <el-select
+                                  size="small"
+                                  v-model="segment.newConstraint.operator"
+                                  placeholder="operator"
+                                >
+                                  <el-option
+                                    v-for="item in operatorOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                  ></el-option>
+                                </el-select>
+                              </el-col>
+                              <el-col :span="11">
+                                <el-input size="small" v-model="segment.newConstraint.value"></el-input>
+                              </el-col>
+                              <el-col :span="4">
+                                <el-button
+                                  class="width--full"
+                                  size="small"
+                                  type="primary"
+                                  plain
+                                  :disabled="
+                                    !segment.newConstraint.property ||
+                                    !segment.newConstraint.value
+                                  "
+                                  @click.prevent="
+                                    () => createConstraint(segment)
+                                  "
+                                >Add Constraint</el-button>
                               </el-col>
                             </el-row>
-
-                            <div class="card--error" v-else>No distribution yet</div>
+                          </div>
+                        </div>
+                      </el-col>
+                      <el-col :span="24" class="segment-distributions">
+                        <h5>
+                          <span>Distribution</span>
+                          <el-button round size="mini" @click="editDistribution(segment)">
+                            <span class="el-icon-edit"></span> edit
+                          </el-button>
+                        </h5>
+                        <el-row type="flex" v-if="segment.distributions.length" :gutter="20">
+                          <el-col
+                            v-for="distribution in segment.distributions"
+                            :key="distribution.id"
+                            :span="6"
+                          >
+                            <el-card shadow="never" class="distribution-card">
+                              <div>
+                                <span size="small">
+                                  {{
+                                  distribution.variantKey
+                                  }}
+                                </span>
+                              </div>
+                              <el-progress
+                                type="circle"
+                                color="#74E5E0"
+                                :width="70"
+                                :percentage="distribution.percent"
+                              ></el-progress>
+                            </el-card>
                           </el-col>
                         </el-row>
-                      </el-card>
-                    </transition-group>
-                  </draggable>
+
+                        <div class="card--error" v-else>No distribution yet</div>
+                      </el-col>
+                    </el-row>
+                  </el-card>
                 </div>
                 <div class="card--error" v-else>No segments created for this feature flag yet</div>
               </el-card>
@@ -558,7 +558,6 @@
 
 <script>
 import clone from "lodash.clone";
-import draggable from "vuedraggable";
 import Axios from "axios";
 
 import constants from "@/constants";
@@ -621,7 +620,6 @@ export default {
     spinner: Spinner,
     debugConsole: DebugConsole,
     flagHistory: FlagHistory,
-    draggable: draggable,
     MarkdownEditor,
     vueJsonEditor
   },
@@ -903,6 +901,22 @@ export default {
       }).then(() => {
         this.$message.success("segment updated");
       }, handleErr.bind(this));
+    },
+    segmentUp(segment, segments){
+      const segmentIndex = segments.findIndex(s => s.id === segment.id);
+
+      if(segmentIndex < 1)
+        return;
+
+      segments.splice(segmentIndex - 1, 0, segments.splice(segmentIndex, 1)[0]);
+    },
+    segmentDown(segment, segments){
+      const segmentIndex = segments.findIndex(s => s.id === segment.id);
+
+      if(segmentIndex > segments.length - 1)
+        return;
+
+      segments.splice(segmentIndex + 1, 0, segments.splice(segmentIndex, 1)[0]);
     },
     putSegmentsReorder(segments) {
       Axios.put(`${API_URL}/flags/${this.flagId}/segments/reorder`, {
