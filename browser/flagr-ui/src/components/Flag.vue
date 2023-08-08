@@ -320,13 +320,7 @@
                       <h2>Segments</h2>
                     </div>
                     <div class="flex-row-right">
-                      <el-tooltip
-                        content="You can drag and drop segments to reorder"
-                        placement="top"
-                        effect="light"
-                      >
-                        <el-button @click="putSegmentsReorder(flag.segments)">Reorder</el-button>
-                      </el-tooltip>
+                      <el-button @click="putSegmentsReorder(flag.segments)">Reorder</el-button>
                       <el-button @click="dialogCreateSegmentOpen = true">New Segment</el-button>
                     </div>
                   </div>
@@ -336,13 +330,13 @@
                     shadow="hover"
                     v-for="segment in flag.segments"
                     :key="segment.id"
-                    class="segment grabbable"
+                    class="segment"
                   >
                     <div class="flex-row id-row">
                       <div class="flex-row-left">
                         <div class="flex-row-left">
-                          <button @click="segmentUp(segment, flag.segments)">Up</button>
-                          <button @click="segmentDown(segment, flag.segments)">Down</button>
+                          <el-button @click="segmentUp(segment, flag.segments)">Up</el-button>
+                          <el-button @click="segmentDown(segment, flag.segments)">Down</el-button>
                         </div>
                         <el-tag type="primary" :disable-transitions="true">
                           Segment ID:
@@ -1003,13 +997,6 @@ export default {
 h5 {
   padding: 0;
   margin: 10px 0 5px;
-}
-
-.grabbable {
-  cursor: move; /* fallback if grab cursor is unsupported */
-  cursor: grab;
-  cursor: -moz-grab;
-  cursor: -webkit-grab;
 }
 
 .flag-inner-config-card {
