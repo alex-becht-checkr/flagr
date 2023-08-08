@@ -411,7 +411,9 @@
                                   </el-select>
                                 </el-col>
                                 <el-col :span="20">
-                                  <el-input size="small" v-model="constraint.value">
+                                  <el-input v-if="listConstraint(constraint)" autosize size="small" label="value" type="textarea" v-model="constraint.value">
+                                  </el-input>
+                                  <el-input v-else size="small" v-model="constraint.value">
                                     <template slot="prepend">Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</template>
                                   </el-input>
                                 </el-col>
@@ -987,6 +989,9 @@ export default {
         this.loaded = true;
       }, handleErr.bind(this));
       this.fetchEntityTypes();
+    },
+    listConstraint(constraint) {
+      return ["IN", "NOTIN"].includes(constraint.operator);
     },
     fetchEntityTypes() {
       function prepareEntityTypes(entityTypes) {
