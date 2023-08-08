@@ -75,16 +75,14 @@
           <el-breadcrumb-item>Flag ID: {{ $route.params.flagId }}</el-breadcrumb-item>
         </el-breadcrumb>
 
-        <div v-if="loaded && flag">
-          <el-tabs>
-            <el-tab-pane label="Config">
-              <el-card class="flag-config-card">
+        <el-card class="flag-config-card">
                 <div slot="header" class="el-card-header">
                   <div class="flex-row">
                     <div class="flex-row-left">
                       <h2>Flag</h2>
                     </div>
-                    <div class="flex-row-right" v-if="flag">
+                    <div class="flex-row-right">
+                      Enabled
                       <el-tooltip content="Enable/Disable Flag" placement="top" effect="light">
                         <el-switch
                           v-model="flag.enabled"
@@ -120,29 +118,6 @@
                         </el-col>
                       </el-row>
                     </el-col>
-                    <el-col style="text-align: right;" :span="5">
-                      <div>
-                        <el-switch
-                          size="small"
-                          v-model="flag.dataRecordsEnabled"
-                          active-color="#74E5E0"
-                          :active-value="true"
-                          :inactive-value="false"
-                        ></el-switch>
-                      </div>
-                    </el-col>
-                    <el-col :span="2">
-                      <div class="data-records-label">
-                        Data Records
-                        <el-tooltip
-                          content="Controls whether to log to data pipeline, e.g. Kafka, Kinesis, Pubsub"
-                          placement="top-end"
-                          effect="light"
-                        >
-                          <span class="el-icon-info" />
-                        </el-tooltip>
-                      </div>
-                    </el-col>
                   </el-row>
                   <el-row class="flag-content" type="flex" align="middle">
                     <el-col :span="17">
@@ -157,38 +132,6 @@
                           </el-input>
                         </el-col>
                       </el-row>
-                    </el-col>
-                    <el-col style="text-align: right;" :span="5">
-                      <div>
-                        <el-select
-                          v-show="!!flag.dataRecordsEnabled"
-                          v-model="flag.entityType"
-                          size="mini"
-                          filterable
-                          :allow-create="allowCreateEntityType"
-                          default-first-option
-                          placeholder="<null>"
-                        >
-                          <el-option
-                            v-for="item in entityTypes"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          ></el-option>
-                        </el-select>
-                      </div>
-                    </el-col>
-                    <el-col :span="2">
-                      <div v-show="!!flag.dataRecordsEnabled" class="data-records-label">
-                        Entity Type
-                        <el-tooltip
-                          content="Overrides the entityType in data records logging"
-                          placement="top-end"
-                          effect="light"
-                        >
-                          <span class="el-icon-info" />
-                        </el-tooltip>
-                      </div>
                     </el-col>
                   </el-row>
                   <el-row style="margin: 10px;">
@@ -244,6 +187,9 @@
                 </el-card>
               </el-card>
 
+        <div v-if="loaded && flag">
+          <el-tabs>
+            <el-tab-pane label="Configuration">
               <el-card class="variants-container">
                 <div slot="header" class="clearfix">
                   <h2>Variants</h2>
@@ -530,19 +476,56 @@
                 </div>
                 <div class="card--error" v-else>No segments created for this feature flag yet</div>
               </el-card>
-              <debug-console :flag="this.flag"></debug-console>
-              <el-card>
-                <div slot="header" class="el-card-header">
-                  <h2>Flag Settings</h2>
-                </div>
-                <el-button @click="dialogDeleteFlagVisible = true" type="danger" plain>
-                  <span class="el-icon-delete"></span>
-                  Delete Flag
-                </el-button>
-              </el-card>
               <spinner v-if="!loaded"></spinner>
             </el-tab-pane>
-
+            <el-tab-pane label="Settings">
+              <div>
+                <el-row class="settings-body">
+                    <el-col>
+                      <div>
+                        <el-switch
+                          size="small"
+                          v-model="flag.dataRecordsEnabled"
+                          active-color="#74E5E0"
+                          :active-value="true"
+                          :inactive-value="false"
+                        ></el-switch>
+                        <span style="margin-left: 10px;">Enable logging to data pipeline, e.g. Kafka, Kinesis, PubSub.</span>
+                      </div>
+                    </el-col>
+                </el-row>
+                <el-row class="settings-body">
+                  <el-col style="margin-left: 50px;">
+                    <span v-show="!!flag.dataRecordsEnabled" >Specify the override of the entityType in data records logging: </span>
+                    <el-select
+                        v-show="!!flag.dataRecordsEnabled"
+                        v-model="flag.entityType"
+                        size="mini"
+                        filterable
+                        :allow-create="allowCreateEntityType"
+                        default-first-option
+                        placeholder="<null>"
+                      >
+                        <el-option
+                          v-for="item in entityTypes"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        ></el-option>
+                    </el-select>
+                  </el-col>
+                </el-row>
+                <el-row class="settings-body">
+                                    <el-button @click="dialogDeleteFlagVisible = true" type="danger" plain>
+                    <span class="el-icon-delete"></span>
+                    Delete Flag
+                  </el-button>
+                </el-row>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="Tools">
+              <debug-console :flag="this.flag"></debug-console>
+            </el-tab-pane>
             <el-tab-pane label="History">
               <flag-history :flag-id="parseInt($route.params.flagId, 10)"></flag-history>
             </el-tab-pane>
@@ -1146,6 +1129,12 @@ ol.constraints-inner {
 .variant-key-input {
   margin-left: 10px;
   width: 50%;
+}
+
+.settings-body {
+  margin-left: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
 }
 
 .save-remove-variant-row {
