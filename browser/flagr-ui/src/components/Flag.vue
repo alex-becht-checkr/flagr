@@ -349,6 +349,7 @@
                           size="small"
                           @click="putSegment(segment)"
                         >Save Segment Setting</el-button>
+                        <el-button size="small" @click="cloneSegment(segment)">Clone Segment</el-button>
                         <el-button @click="deleteSegment(segment)" size="small">
                           <span class="el-icon-delete" />
                         </el-button>
@@ -741,15 +742,12 @@ export default {
         return dist
       });
 
-      Axios.put(
-        `${API_URL}/flags/${this.flagId}/segments/${segment.id}/distributions`,
-        { distributions }
-      ).then(response => {
+      this.putDistributions(segment.id, distributions).then(response => {
         let distributions = response.data;
         this.selectedSegment.distributions = distributions;
         this.dialogEditDistributionOpen = false;
         this.$message.success("distributions updated");
-      }, handleErr.bind(this));
+      });
     },
     createVariant() {
       Axios.post(
@@ -855,15 +853,19 @@ export default {
       );
     },
     createConstraint(segment) {
-      Axios.post(
-        `${API_URL}/flags/${this.flagId}/segments/${segment.id}/constraints`,
-        segment.newConstraint
-      ).then(response => {
+      this.postConstraint(segment.id, segment.newConstraint)
+      .then(response => {
         let constraint = response.data;
         segment.constraints.push(constraint);
         segment.newConstraint = clone(DEFAULT_CONSTRAINT);
         this.$message.success("new constraint created");
       }, handleErr.bind(this));
+    },
+    postConstraint(segmentId, constraint) {
+      return Axios.post(
+        `${API_URL}/flags/${this.flagId}/segments/${segmentId}/constraints`,
+        constraint,
+      ).catch(handleErr.bind(this));
     },
     putConstraint(segment, constraint) {
       Axios.put(
@@ -895,6 +897,30 @@ export default {
       }).then(() => {
         this.$message.success("segment updated");
       }, handleErr.bind(this));
+    },
+    cloneSegment(segment) {
+      const errorHandler = handleErr.bind(this);
+      // create segment first
+      Axios.post(
+        `${API_URL}/flags/${this.flagId}/segments`,
+        {
+          description: `${segment.description} (Clone)`,
+          rolloutPercent: segment.rolloutPercent,
+        }
+      ).then(response => {
+        let newSegment = response.data;
+        // clone distribution
+        const distributions = segment.distributions.map(({ percent, variantID, variantKey }) => ({ percent, variantID, variantKey }));
+        this.putDistributions(newSegment.id, distributions).then(async () => {
+          // clone constraints sequentially to preserve order
+          for (const constraint of segment.constraints) {
+            await this.postConstraint(newSegment.id, constraint);
+          }
+          this.$message.success('Segment successfully cloned')
+          // Re fetch flag to update state
+          this.fetchFlag();
+        }, errorHandler);
+      }, errorHandler);
     },
     segmentUp(segment, segments){
       const segmentIndex = segments.findIndex(s => s.id === segment.id);
@@ -945,6 +971,12 @@ export default {
         this.$message.success("new segment created");
         this.dialogCreateSegmentOpen = false;
       }, handleErr.bind(this));
+    },
+    putDistributions(segmentId, distributions) {
+      return Axios.put(
+        `${API_URL}/flags/${this.flagId}/segments/${segmentId}/distributions`,
+        { distributions },
+      ).catch(handleErr.bind(this));
     },
     fetchFlag() {
       Axios.get(`${API_URL}/flags/${this.flagId}`).then(response => {
