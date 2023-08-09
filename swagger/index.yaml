@@ -51,6 +51,8 @@ paths:
     $ref: ./flags.yaml
   /flags/{flagID}:
     $ref: ./flag.yaml
+  /flags/{flagID}/full:
+    $ref: ./flag_full.yaml
   /flags/{flagID}/restore:
     $ref: ./flag_restore.yaml
   /flags/{flagID}/enabled:
@@ -251,7 +253,7 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
+        # readOnly: true
       description:
         type: string
         minLength: 1
@@ -323,7 +325,7 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
+        # readOnly: true
       key:
         type: string
         minLength: 1
@@ -362,7 +364,7 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
+        # readOnly: true
       property:
         type: string
         minLength: 1
@@ -414,7 +416,7 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
+        # readOnly: true
       percent:
         type: integer
         format: int64

@@ -21,7 +21,6 @@ import (
 type Constraint struct {
 
 	// id
-	// Read Only: true
 	// Minimum: 1
 	ID int64 `json:"id,omitempty"`
 
@@ -183,26 +182,8 @@ func (m *Constraint) validateValue(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this constraint based on the context it is used
+// ContextValidate validates this constraint based on context it is used
 func (m *Constraint) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateID(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Constraint) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
-
-	if err := validate.ReadOnly(ctx, "id", "body", int64(m.ID)); err != nil {
-		return err
-	}
-
 	return nil
 }
 

@@ -199,6 +199,34 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
+  /flags/{flagID}/full:
+    put:
+      tags:
+        - flag
+      operationId: putFullFlag
+      parameters:
+        - in: path
+          name: flagID
+          description: numeric ID of the flag to update
+          required: true
+          type: integer
+          format: int64
+          minimum: 1
+        - in: body
+          name: body
+          description: fully formed flag body for the update
+          required: true
+          schema:
+            $ref: '#/definitions/flag'
+      responses:
+        '200':
+          description: returns the updated flag
+          schema:
+            $ref: '#/definitions/flag'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
   /flags/{flagID}/restore:
     put:
       tags:
@@ -1175,7 +1203,6 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
       description:
         type: string
         minLength: 1
@@ -1245,7 +1272,6 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
       key:
         type: string
         minLength: 1
@@ -1282,7 +1308,6 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
       property:
         type: string
         minLength: 1
@@ -1332,7 +1357,6 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
       percent:
         type: integer
         format: int64

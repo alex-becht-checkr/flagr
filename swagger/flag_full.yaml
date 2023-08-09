@@ -1,0 +1,27 @@
+put:
+  tags:
+    - flag
+  operationId: putFullFlag
+  parameters:
+    - in: path
+      name: flagID
+      description: numeric ID of the flag to update
+      required: true
+      type: integer
+      format: int64
+      minimum: 1
+    - in: body
+      name: body
+      description: fully formed flag body for the update
+      required: true
+      schema:
+        $ref: "#/definitions/flag"
+  responses:
+    200:
+      description: returns the updated flag
+      schema:
+        $ref: "#/definitions/flag"
+    default:
+      description: generic error response
+      schema:
+        $ref: "#/definitions/error"

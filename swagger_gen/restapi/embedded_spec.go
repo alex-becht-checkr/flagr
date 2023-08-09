@@ -522,6 +522,48 @@ func init() {
         }
       }
     },
+    "/flags/{flagID}/full": {
+      "put": {
+        "tags": [
+          "flag"
+        ],
+        "operationId": "putFullFlag",
+        "parameters": [
+          {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int64",
+            "description": "numeric ID of the flag to update",
+            "name": "flagID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "fully formed flag body for the update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/flag"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns the updated flag",
+            "schema": {
+              "$ref": "#/definitions/flag"
+            }
+          },
+          "default": {
+            "description": "generic error response",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
     "/flags/{flagID}/restore": {
       "put": {
         "tags": [
@@ -1478,8 +1520,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "operator": {
           "type": "string",
@@ -1618,8 +1659,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "percent": {
           "type": "integer",
@@ -2058,8 +2098,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "rank": {
           "type": "integer",
@@ -2126,8 +2165,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "key": {
           "type": "string",
@@ -2703,6 +2741,48 @@ func init() {
         }
       }
     },
+    "/flags/{flagID}/full": {
+      "put": {
+        "tags": [
+          "flag"
+        ],
+        "operationId": "putFullFlag",
+        "parameters": [
+          {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int64",
+            "description": "numeric ID of the flag to update",
+            "name": "flagID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "fully formed flag body for the update",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/flag"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns the updated flag",
+            "schema": {
+              "$ref": "#/definitions/flag"
+            }
+          },
+          "default": {
+            "description": "generic error response",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
     "/flags/{flagID}/restore": {
       "put": {
         "tags": [
@@ -3659,8 +3739,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "operator": {
           "type": "string",
@@ -3800,8 +3879,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "percent": {
           "type": "integer",
@@ -4242,8 +4320,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "rank": {
           "type": "integer",
@@ -4312,8 +4389,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "key": {
           "type": "string",

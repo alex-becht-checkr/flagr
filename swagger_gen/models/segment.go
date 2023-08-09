@@ -32,7 +32,6 @@ type Segment struct {
 	Distributions []*Distribution `json:"distributions"`
 
 	// id
-	// Read Only: true
 	// Minimum: 1
 	ID int64 `json:"id,omitempty"`
 
@@ -201,10 +200,6 @@ func (m *Segment) ContextValidate(ctx context.Context, formats strfmt.Registry) 
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateID(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -256,15 +251,6 @@ func (m *Segment) contextValidateDistributions(ctx context.Context, formats strf
 			}
 		}
 
-	}
-
-	return nil
-}
-
-func (m *Segment) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
-
-	if err := validate.ReadOnly(ctx, "id", "body", int64(m.ID)); err != nil {
-		return err
 	}
 
 	return nil

@@ -30,6 +30,7 @@ type CRUD interface {
 	CreateFlag(flag.CreateFlagParams) middleware.Responder
 	GetFlag(flag.GetFlagParams) middleware.Responder
 	PutFlag(flag.PutFlagParams) middleware.Responder
+	PutFullFlag(flag.PutFullFlagParams) middleware.Responder
 	DeleteFlag(flag.DeleteFlagParams) middleware.Responder
 	RestoreFlag(flag.RestoreFlagParams) middleware.Responder
 	SetFlagEnabledState(flag.SetFlagEnabledParams) middleware.Responder
@@ -282,29 +283,8 @@ func (c *crud) PutFlag(params flag.PutFlagParams) middleware.Responder {
 		return flag.NewPutFlagDefault(404).WithPayload(ErrorMessage("%s", err))
 	}
 
-	if params.Body.Description != nil {
-		f.Description = *params.Body.Description
-	}
-	if params.Body.DataRecordsEnabled != nil {
-		f.DataRecordsEnabled = *params.Body.DataRecordsEnabled
-	}
-	if params.Body.Key != nil {
-		key, err := entity.CreateFlagKey(*params.Body.Key)
-		if err != nil {
-			return flag.NewPutFlagDefault(400).WithPayload(ErrorMessage("%s", err))
-		}
-		f.Key = key
-	}
-	if params.Body.EntityType != nil {
-		et := *params.Body.EntityType
-		if err := entity.CreateFlagEntityType(tx, et); err != nil {
-			return flag.NewPutFlagDefault(400).WithPayload(ErrorMessage("%s", err))
-		}
-		f.EntityType = et
-	}
-
-	if params.Body.Notes != nil {
-		f.Notes = *params.Body.Notes
+	if UpdateFlag(params, f, tx) != nil {
+		return flag.NewPutFlagDefault(400)
 	}
 
 	if err := tx.Save(f).Error; err != nil {
@@ -319,6 +299,48 @@ func (c *crud) PutFlag(params flag.PutFlagParams) middleware.Responder {
 	payload, err := e2rMapFlag(f)
 	if err != nil {
 		return flag.NewPutFlagDefault(500).WithPayload(ErrorMessage("%s", err))
+	}
+	resp.SetPayload(payload)
+
+	entity.SaveFlagSnapshot(getDB(), util.SafeUint(params.FlagID), getSubjectFromRequest(params.HTTPRequest))
+	return resp
+}
+
+func (c *crud) PutFullFlag(params flag.PutFullFlagParams) middleware.Responder {
+	f := &entity.Flag{}
+	tx := getDB()
+
+	if err := tx.First(f, params.FlagID).Error; err != nil {
+		return flag.NewPutFullFlagDefault(404).WithPayload(ErrorMessage("%s", err))
+	}
+
+	putFlagRequest := models.PutFlagRequest{params.Body.DataRecordsEnabled, params.Body.Description, params.Body.Enabled, &params.Body.EntityType, &params.Body.Key, &params.Body.Notes}
+	flagParams := flag.PutFlagParams{params.HTTPRequest, &putFlagRequest, params.FlagID}
+
+	if err := UpdateFlag(flagParams, f, tx); err != nil {
+		return flag.NewPutFullFlagDefault(400).WithPayload(ErrorMessage("%s", err))
+	}
+
+	if err := tx.Save(f).Error; err != nil {
+		return flag.NewPutFullFlagDefault(500).WithPayload(ErrorMessage("%s", err))
+	}
+
+	if err := UpdateVariants(params.Body.Variants, int64(f.ID)); err != nil {
+		return flag.NewPutFullFlagDefault(400).WithPayload(ErrorMessage("%s", err))
+	}
+
+	if err := UpdateSegments(params.Body.Segments, int64(f.ID)); err != nil {
+		return flag.NewPutFullFlagDefault(400).WithPayload(ErrorMessage("%s", err))
+	}
+
+	if err := entity.PreloadSegmentsVariantsTags(tx).First(f, params.FlagID).Error; err != nil {
+		return flag.NewPutFlagDefault(500).WithPayload(ErrorMessage("%s", err))
+	}
+
+	resp := flag.NewPutFullFlagOK()
+	payload, err := e2rMapFlag(f)
+	if err != nil {
+		return flag.NewPutFullFlagDefault(500).WithPayload(ErrorMessage("%s", err))
 	}
 	resp.SetPayload(payload)
 

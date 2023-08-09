@@ -140,6 +140,9 @@ func NewFlagrAPI(spec *loads.Document) *FlagrAPI {
 		FlagPutFlagHandler: flag.PutFlagHandlerFunc(func(params flag.PutFlagParams) middleware.Responder {
 			return middleware.NotImplemented("operation flag.PutFlag has not yet been implemented")
 		}),
+		FlagPutFullFlagHandler: flag.PutFullFlagHandlerFunc(func(params flag.PutFullFlagParams) middleware.Responder {
+			return middleware.NotImplemented("operation flag.PutFullFlag has not yet been implemented")
+		}),
 		SegmentPutSegmentHandler: segment.PutSegmentHandlerFunc(func(params segment.PutSegmentParams) middleware.Responder {
 			return middleware.NotImplemented("operation segment.PutSegment has not yet been implemented")
 		}),
@@ -253,6 +256,8 @@ type FlagrAPI struct {
 	DistributionPutDistributionsHandler distribution.PutDistributionsHandler
 	// FlagPutFlagHandler sets the operation handler for the put flag operation
 	FlagPutFlagHandler flag.PutFlagHandler
+	// FlagPutFullFlagHandler sets the operation handler for the put full flag operation
+	FlagPutFullFlagHandler flag.PutFullFlagHandler
 	// SegmentPutSegmentHandler sets the operation handler for the put segment operation
 	SegmentPutSegmentHandler segment.PutSegmentHandler
 	// SegmentPutSegmentsReorderHandler sets the operation handler for the put segments reorder operation
@@ -429,6 +434,9 @@ func (o *FlagrAPI) Validate() error {
 	}
 	if o.FlagPutFlagHandler == nil {
 		unregistered = append(unregistered, "flag.PutFlagHandler")
+	}
+	if o.FlagPutFullFlagHandler == nil {
+		unregistered = append(unregistered, "flag.PutFullFlagHandler")
 	}
 	if o.SegmentPutSegmentHandler == nil {
 		unregistered = append(unregistered, "segment.PutSegmentHandler")
@@ -651,6 +659,10 @@ func (o *FlagrAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/flags/{flagID}"] = flag.NewPutFlag(o.context, o.FlagPutFlagHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/flags/{flagID}/full"] = flag.NewPutFullFlag(o.context, o.FlagPutFullFlagHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

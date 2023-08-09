@@ -23,7 +23,6 @@ type Variant struct {
 	Attachment interface{} `json:"attachment,omitempty"`
 
 	// id
-	// Read Only: true
 	// Minimum: 1
 	ID int64 `json:"id,omitempty"`
 
@@ -76,26 +75,8 @@ func (m *Variant) validateKey(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this variant based on the context it is used
+// ContextValidate validates this variant based on context it is used
 func (m *Variant) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateID(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Variant) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
-
-	if err := validate.ReadOnly(ctx, "id", "body", int64(m.ID)); err != nil {
-		return err
-	}
-
 	return nil
 }
 
