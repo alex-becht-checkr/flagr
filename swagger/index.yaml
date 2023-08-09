@@ -111,7 +111,7 @@ definitions:
         type: integer
         format: int64
         minimum: 1
-        readOnly: true
+        # readOnly: true
       key:
         description: unique key representation of the flag
         type: string

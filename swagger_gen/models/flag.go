@@ -40,7 +40,6 @@ type Flag struct {
 	EntityType string `json:"entityType,omitempty"`
 
 	// id
-	// Read Only: true
 	// Minimum: 1
 	ID int64 `json:"id,omitempty"`
 
@@ -266,10 +265,6 @@ func (m *Flag) validateVariants(formats strfmt.Registry) error {
 func (m *Flag) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateID(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateSegments(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -285,15 +280,6 @@ func (m *Flag) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Flag) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
-
-	if err := validate.ReadOnly(ctx, "id", "body", int64(m.ID)); err != nil {
-		return err
-	}
-
 	return nil
 }
 

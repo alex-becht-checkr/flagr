@@ -1899,8 +1899,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "isDeleted": {
           "type": "boolean"
@@ -4120,8 +4119,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "isDeleted": {
           "type": "boolean"
