@@ -1,26 +1,40 @@
 <template>
   <div>
-    <el-card v-for="diff in diffs" :key="diff.newId" class="snapshot-container">
-      <div slot="header" class="el-card-header">
-        <el-row>
-          <el-col :span="14">
-            <div class="diff-snapshot-id-change">
-              <el-tag :disable-transitions="true">Snapshot ID: {{ diff.oldId }}</el-tag>
-              <span class="el-icon-d-arrow-right" />
-              <el-tag :disable-transitions="true">Snapshot ID: {{ diff.newId }}</el-tag>
-            </div>
-          </el-col>
-          <el-col :span="10" style="text-align: right; color: #2e4960">
-            <div v-bind:class="{ compact: diff.updatedBy }">
-              <span size="small">{{ diff.timestamp }}</span>
-            </div>
-            <div class="compact" v-if="diff.updatedBy">
-              <span size="small">UPDATED BY: {{ diff.updatedBy }}</span>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-      <pre class="diff" v-html="diff.flagDiff"></pre>
+    <el-card class="snapshot-container">
+      Compact View
+      <el-switch
+        v-model="compactView"
+        active-color="#13ce66"
+        inactive-color="#ff4949"
+        :active-value="true"
+        :inactive-value="false"
+      ></el-switch>
+      <el-table
+        :data="diffs"
+        :default-sort = "{prop: 'newId', order: 'descending'}"
+        style="width: 100%">
+        <el-table-column type="expand">
+          <template slot-scope="props">
+            <pre v-if="compactView" class="diff" v-html="props.row.flagDiff[1]"></pre>
+            <pre v-else class="diff" v-html="props.row.flagDiff[0]"></pre>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="Snapshot ID"
+          prop="newId"
+          sortable>
+        </el-table-column>
+        <el-table-column
+          label="Updated At"
+          prop="timestamp"
+          sortable>
+        </el-table-column>
+        <el-table-column
+          label="Updated By"
+          prop="updatedBy"
+          sortable>
+        </el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
@@ -38,7 +52,8 @@ export default {
   props: ["flagId"],
   data() {
     return {
-      flagSnapshots: []
+      flagSnapshots: [],
+      compactView: true
     };
   },
   computed: {
@@ -76,7 +91,9 @@ export default {
       if (d.length === 1) {
         return "No changes";
       }
-      return convertChangesToXML(d);
+      const fullChanges = convertChangesToXML(d);
+      const compactChanges = fullChanges.substring(fullChanges.indexOf("<del>"), fullChanges.lastIndexOf("</ins>") + 6);
+      return [fullChanges, compactChanges];
     }
   },
   mounted() {
@@ -87,13 +104,6 @@ export default {
 
 <style lang="less">
 .snapshot-container {
-  .diff-snapshot-id-change {
-    color: white;
-    .el-tag {
-      color: #2e4960;
-      background-color: white;
-    }
-  }
   .diff {
     margin: 0;
     del {
