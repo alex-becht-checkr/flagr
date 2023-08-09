@@ -12,6 +12,9 @@
       <el-table
         :data="diffs"
         :default-sort = "{prop: 'newId', order: 'descending'}"
+        stripe
+        row-key="newId"
+        :expand-row-keys=[latestSnapshot]
         style="width: 100%">
         <el-table-column type="expand">
           <template slot-scope="props">
@@ -53,7 +56,8 @@ export default {
   data() {
     return {
       flagSnapshots: [],
-      compactView: true
+      compactView: true,
+      latestSnapshot: 0,
     };
   },
   computed: {
@@ -78,6 +82,7 @@ export default {
       Axios.get(`${API_URL}/flags/${this.$props.flagId}/snapshots`).then(
         response => {
           this.flagSnapshots = response.data;
+          this.latestSnapshot = this.flagSnapshots[0].id
         },
         () => {
           this.$message.error(`failed to get flag snapshots`);
