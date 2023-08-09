@@ -223,6 +223,18 @@ func init() {
             "description": "return all deleted flags",
             "name": "deleted",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "return all flags including deleted ones",
+            "name": "include_deleted",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "return flags ordered by most recently created",
+            "name": "ordered_by_most_recent",
+            "in": "query"
           }
         ],
         "responses": {
@@ -264,6 +276,72 @@ func init() {
             "description": "returns the created flag",
             "schema": {
               "$ref": "#/definitions/flag"
+            }
+          },
+          "default": {
+            "description": "generic error response",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/flags/count": {
+      "get": {
+        "tags": [
+          "flag"
+        ],
+        "operationId": "countFlags",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "count only deleted flags",
+            "name": "deleted",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "include all deleted flags in the count",
+            "name": "include_deleted",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "count only flags having given enabled status",
+            "name": "enabled",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags exactly matching given description",
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags partially matching given description",
+            "name": "description_like",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags matching given key",
+            "name": "key",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags with the given tags (comma separated)",
+            "name": "tags",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns the count of active flags",
+            "schema": {
+              "$ref": "#/definitions/count"
             }
           },
           "default": {
@@ -1431,6 +1509,17 @@ func init() {
         }
       }
     },
+    "count": {
+      "type": "object",
+      "required": [
+        "totalFlags"
+      ],
+      "properties": {
+        "totalFlags": {
+          "type": "integer"
+        }
+      }
+    },
     "createConstraintRequest": {
       "type": "object",
       "required": [
@@ -1772,6 +1861,9 @@ func init() {
           "format": "int64",
           "minimum": 1,
           "readOnly": true
+        },
+        "isDeleted": {
+          "type": "boolean"
         },
         "key": {
           "description": "unique key representation of the flag",
@@ -2312,6 +2404,18 @@ func init() {
             "description": "return all deleted flags",
             "name": "deleted",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "return all flags including deleted ones",
+            "name": "include_deleted",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "return flags ordered by most recently created",
+            "name": "ordered_by_most_recent",
+            "in": "query"
           }
         ],
         "responses": {
@@ -2353,6 +2457,72 @@ func init() {
             "description": "returns the created flag",
             "schema": {
               "$ref": "#/definitions/flag"
+            }
+          },
+          "default": {
+            "description": "generic error response",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/flags/count": {
+      "get": {
+        "tags": [
+          "flag"
+        ],
+        "operationId": "countFlags",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "count only deleted flags",
+            "name": "deleted",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "include all deleted flags in the count",
+            "name": "include_deleted",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "count only flags having given enabled status",
+            "name": "enabled",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags exactly matching given description",
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags partially matching given description",
+            "name": "description_like",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags matching given key",
+            "name": "key",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "count only flags with the given tags (comma separated)",
+            "name": "tags",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns the count of active flags",
+            "schema": {
+              "$ref": "#/definitions/count"
             }
           },
           "default": {
@@ -3520,6 +3690,17 @@ func init() {
         }
       }
     },
+    "count": {
+      "type": "object",
+      "required": [
+        "totalFlags"
+      ],
+      "properties": {
+        "totalFlags": {
+          "type": "integer"
+        }
+      }
+    },
     "createConstraintRequest": {
       "type": "object",
       "required": [
@@ -3863,6 +4044,9 @@ func init() {
           "format": "int64",
           "minimum": 1,
           "readOnly": true
+        },
+        "isDeleted": {
+          "type": "boolean"
         },
         "key": {
           "description": "unique key representation of the flag",

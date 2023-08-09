@@ -41,6 +41,14 @@ get:
       name: deleted
       type: boolean
       description: return all deleted flags
+    - in: query
+      name: include_deleted
+      type: boolean
+      description: return all flags including deleted ones
+    - in: query
+      name: ordered_by_most_recent
+      type: boolean
+      description: return flags ordered by most recently created
   responses:
     200:
       description: list all the flags

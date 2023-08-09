@@ -18,6 +18,7 @@ func MapFlag(e *entity.Flag) (*models.Flag, error) {
 	r.Key = e.Key
 	r.CreatedBy = e.CreatedBy
 	r.DataRecordsEnabled = util.BoolPtr(e.DataRecordsEnabled)
+	r.IsDeleted = e.DeletedAt.Valid
 	r.EntityType = e.EntityType
 	r.Description = util.StringPtr(e.Description)
 	r.Notes = e.Notes

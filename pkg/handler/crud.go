@@ -9,6 +9,7 @@ import (
 	"github.com/openflagr/flagr/pkg/mapper/entity_restapi/e2r"
 	"github.com/openflagr/flagr/pkg/mapper/entity_restapi/r2e"
 	"github.com/openflagr/flagr/pkg/util"
+	"github.com/openflagr/flagr/swagger_gen/models"
 	"github.com/openflagr/flagr/swagger_gen/restapi/operations/constraint"
 	"github.com/openflagr/flagr/swagger_gen/restapi/operations/distribution"
 	"github.com/openflagr/flagr/swagger_gen/restapi/operations/flag"
@@ -25,6 +26,7 @@ import (
 type CRUD interface {
 	// Flags
 	FindFlags(flag.FindFlagsParams) middleware.Responder
+	CountFlags(flag.CountFlagsParams) middleware.Responder
 	CreateFlag(flag.CreateFlagParams) middleware.Responder
 	GetFlag(flag.GetFlagParams) middleware.Responder
 	PutFlag(flag.PutFlagParams) middleware.Responder
@@ -116,11 +118,18 @@ func (c *crud) FindFlags(params flag.FindFlagsParams) middleware.Responder {
 	if params.Deleted != nil && *params.Deleted {
 		tx = tx.Where("deleted_at is not null")
 	} else {
-		tx = tx.Where("deleted_at is null")
+		if params.IncludeDeleted == nil || !*params.IncludeDeleted {
+			tx = tx.Where("deleted_at is null")
+		}
 	}
 
 	var err error
-	tx = tx.Order("id").Where(q)
+	if params.OrderedByMostRecent != nil && *params.OrderedByMostRecent {
+		tx = tx.Order("id desc")
+	} else {
+		tx = tx.Order("id")
+	}
+	tx = tx.Where(q)
 	if params.Tags != nil {
 		t := []entity.Tag{}
 		getDB().Where("value in (?)", strings.Split(*params.Tags, ",")).Find(&t)
@@ -223,6 +232,46 @@ func (c *crud) GetFlagEntityTypes(params flag.GetFlagEntityTypesParams) middlewa
 	resp := flag.NewGetFlagEntityTypesOK()
 	resp.SetPayload(payload)
 	return resp
+}
+
+func (c *crud) CountFlags(params flag.CountFlagsParams) middleware.Responder {
+	var count int64
+	tx := getDB().Unscoped()
+	q := entity.Flag{}
+
+	if params.Deleted != nil && *params.Deleted {
+		tx = tx.Where("deleted_at is not null")
+	} else {
+		if params.IncludeDeleted == nil || !*params.IncludeDeleted {
+			tx = tx.Where("deleted_at is null")
+		}
+	}
+	if params.Enabled != nil {
+		tx = tx.Where("enabled = ?", *params.Enabled)
+	}
+	if params.Description != nil {
+		q.Description = *params.Description
+	}
+	if params.DescriptionLike != nil {
+		tx = tx.Where(
+			"lower(description) like ?",
+			fmt.Sprintf("%%%s%%", strings.ToLower(*params.DescriptionLike)),
+		)
+	}
+	if params.Key != nil {
+		q.Key = *params.Key
+	}
+
+	tx = tx.Where(q)
+	if params.Tags != nil {
+		t := []entity.Tag{}
+		getDB().Where("value in (?)", strings.Split(*params.Tags, ",")).Find(&t)
+		count = tx.Model(&t).Group("flags.id").Association("Flags").Count()
+	} else {
+		tx.Model(&q).Count(&count)
+	}
+	
+	return flag.NewCountFlagsOK().WithPayload(&models.Count{TotalFlags: &count})
 }
 
 func (c *crud) PutFlag(params flag.PutFlagParams) middleware.Responder {

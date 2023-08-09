@@ -37,6 +37,7 @@ func setupCRUD(api *operations.FlagrAPI) {
 	c := NewCRUD()
 	// flags
 	api.FlagFindFlagsHandler = flag.FindFlagsHandlerFunc(c.FindFlags)
+	api.FlagCountFlagsHandler = flag.CountFlagsHandlerFunc(c.CountFlags)
 	api.FlagCreateFlagHandler = flag.CreateFlagHandlerFunc(c.CreateFlag)
 	api.FlagGetFlagHandler = flag.GetFlagHandlerFunc(c.GetFlag)
 	api.FlagPutFlagHandler = flag.PutFlagHandlerFunc(c.PutFlag)

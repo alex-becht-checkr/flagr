@@ -13,19 +13,15 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// FindFlagsURL generates an URL for the find flags operation
-type FindFlagsURL struct {
-	Deleted             *bool
-	Description         *string
-	DescriptionLike     *string
-	Enabled             *bool
-	IncludeDeleted      *bool
-	Key                 *string
-	Limit               *int64
-	Offset              *int64
-	OrderedByMostRecent *bool
-	Preload             *bool
-	Tags                *string
+// CountFlagsURL generates an URL for the count flags operation
+type CountFlagsURL struct {
+	Deleted         *bool
+	Description     *string
+	DescriptionLike *string
+	Enabled         *bool
+	IncludeDeleted  *bool
+	Key             *string
+	Tags            *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -35,7 +31,7 @@ type FindFlagsURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *FindFlagsURL) WithBasePath(bp string) *FindFlagsURL {
+func (o *CountFlagsURL) WithBasePath(bp string) *CountFlagsURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -43,15 +39,15 @@ func (o *FindFlagsURL) WithBasePath(bp string) *FindFlagsURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *FindFlagsURL) SetBasePath(bp string) {
+func (o *CountFlagsURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *FindFlagsURL) Build() (*url.URL, error) {
+func (o *CountFlagsURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/flags"
+	var _path = "/flags/count"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -109,38 +105,6 @@ func (o *FindFlagsURL) Build() (*url.URL, error) {
 		qs.Set("key", keyQ)
 	}
 
-	var limitQ string
-	if o.Limit != nil {
-		limitQ = swag.FormatInt64(*o.Limit)
-	}
-	if limitQ != "" {
-		qs.Set("limit", limitQ)
-	}
-
-	var offsetQ string
-	if o.Offset != nil {
-		offsetQ = swag.FormatInt64(*o.Offset)
-	}
-	if offsetQ != "" {
-		qs.Set("offset", offsetQ)
-	}
-
-	var orderedByMostRecentQ string
-	if o.OrderedByMostRecent != nil {
-		orderedByMostRecentQ = swag.FormatBool(*o.OrderedByMostRecent)
-	}
-	if orderedByMostRecentQ != "" {
-		qs.Set("ordered_by_most_recent", orderedByMostRecentQ)
-	}
-
-	var preloadQ string
-	if o.Preload != nil {
-		preloadQ = swag.FormatBool(*o.Preload)
-	}
-	if preloadQ != "" {
-		qs.Set("preload", preloadQ)
-	}
-
 	var tagsQ string
 	if o.Tags != nil {
 		tagsQ = *o.Tags
@@ -155,7 +119,7 @@ func (o *FindFlagsURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *FindFlagsURL) Must(u *url.URL, err error) *url.URL {
+func (o *CountFlagsURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -166,17 +130,17 @@ func (o *FindFlagsURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *FindFlagsURL) String() string {
+func (o *CountFlagsURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *FindFlagsURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *CountFlagsURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on FindFlagsURL")
+		return nil, errors.New("scheme is required for a full url on CountFlagsURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on FindFlagsURL")
+		return nil, errors.New("host is required for a full url on CountFlagsURL")
 	}
 
 	base, err := o.Build()
@@ -190,6 +154,6 @@ func (o *FindFlagsURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *FindFlagsURL) StringFull(scheme, host string) string {
+func (o *CountFlagsURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

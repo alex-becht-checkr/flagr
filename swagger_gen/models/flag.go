@@ -44,6 +44,9 @@ type Flag struct {
 	// Minimum: 1
 	ID int64 `json:"id,omitempty"`
 
+	// is deleted
+	IsDeleted bool `json:"isDeleted,omitempty"`
+
 	// unique key representation of the flag
 	// Min Length: 1
 	Key string `json:"key,omitempty"`

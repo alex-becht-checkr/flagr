@@ -53,6 +53,9 @@ func NewFlagrAPI(spec *loads.Document) *FlagrAPI {
 		BinProducer:  runtime.ByteStreamProducer(),
 		JSONProducer: runtime.JSONProducer(),
 
+		FlagCountFlagsHandler: flag.CountFlagsHandlerFunc(func(params flag.CountFlagsParams) middleware.Responder {
+			return middleware.NotImplemented("operation flag.CountFlags has not yet been implemented")
+		}),
 		ConstraintCreateConstraintHandler: constraint.CreateConstraintHandlerFunc(func(params constraint.CreateConstraintParams) middleware.Responder {
 			return middleware.NotImplemented("operation constraint.CreateConstraint has not yet been implemented")
 		}),
@@ -192,6 +195,8 @@ type FlagrAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// FlagCountFlagsHandler sets the operation handler for the count flags operation
+	FlagCountFlagsHandler flag.CountFlagsHandler
 	// ConstraintCreateConstraintHandler sets the operation handler for the create constraint operation
 	ConstraintCreateConstraintHandler constraint.CreateConstraintHandler
 	// FlagCreateFlagHandler sets the operation handler for the create flag operation
@@ -338,6 +343,9 @@ func (o *FlagrAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.FlagCountFlagsHandler == nil {
+		unregistered = append(unregistered, "flag.CountFlagsHandler")
+	}
 	if o.ConstraintCreateConstraintHandler == nil {
 		unregistered = append(unregistered, "constraint.CreateConstraintHandler")
 	}
@@ -527,6 +535,10 @@ func (o *FlagrAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/flags/count"] = flag.NewCountFlags(o.context, o.FlagCountFlagsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

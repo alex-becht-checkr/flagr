@@ -79,6 +79,8 @@ paths:
     $ref: ./flag_snapshots.yaml
   /flags/entity_types:
     $ref: ./flag_entity_types.yaml
+  /flags/count:
+    $ref: ./flags_count.yaml
   /tags:
     $ref: ./tags.yaml
   /evaluation:
@@ -116,6 +118,8 @@ definitions:
         type: string
         minLength: 1
       enabled:
+        type: boolean
+      isDeleted:
         type: boolean
       tags:
         type: array
@@ -586,6 +590,15 @@ definitions:
     properties:
       status:
         type: string
+
+  # Flag count
+  count:
+    type: object
+    required:
+      - totalFlags
+    properties:
+      totalFlags:
+        type: integer
 
   # Default Error
   error:

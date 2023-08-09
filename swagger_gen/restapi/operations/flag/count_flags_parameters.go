@@ -15,64 +15,48 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewFindFlagsParams creates a new FindFlagsParams object
+// NewCountFlagsParams creates a new CountFlagsParams object
 //
 // There are no default values defined in the spec.
-func NewFindFlagsParams() FindFlagsParams {
+func NewCountFlagsParams() CountFlagsParams {
 
-	return FindFlagsParams{}
+	return CountFlagsParams{}
 }
 
-// FindFlagsParams contains all the bound params for the find flags operation
+// CountFlagsParams contains all the bound params for the count flags operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters findFlags
-type FindFlagsParams struct {
+// swagger:parameters countFlags
+type CountFlagsParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*return all deleted flags
+	/*count only deleted flags
 	  In: query
 	*/
 	Deleted *bool
-	/*return flags exactly matching given description
+	/*count only flags exactly matching given description
 	  In: query
 	*/
 	Description *string
-	/*return flags partially matching given description
+	/*count only flags partially matching given description
 	  In: query
 	*/
 	DescriptionLike *string
-	/*return flags having given enabled status
+	/*count only flags having given enabled status
 	  In: query
 	*/
 	Enabled *bool
-	/*return all flags including deleted ones
+	/*include all deleted flags in the count
 	  In: query
 	*/
 	IncludeDeleted *bool
-	/*return flags matching given key
+	/*count only flags matching given key
 	  In: query
 	*/
 	Key *string
-	/*the numbers of flags to return
-	  In: query
-	*/
-	Limit *int64
-	/*return flags given the offset, it should usually set together with limit
-	  In: query
-	*/
-	Offset *int64
-	/*return flags ordered by most recently created
-	  In: query
-	*/
-	OrderedByMostRecent *bool
-	/*return flags with preloaded segments and variants
-	  In: query
-	*/
-	Preload *bool
-	/*return flags with the given tags (comma separated)
+	/*count only flags with the given tags (comma separated)
 	  In: query
 	*/
 	Tags *string
@@ -81,8 +65,8 @@ type FindFlagsParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewFindFlagsParams() beforehand.
-func (o *FindFlagsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewCountFlagsParams() beforehand.
+func (o *CountFlagsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -119,26 +103,6 @@ func (o *FindFlagsParams) BindRequest(r *http.Request, route *middleware.Matched
 		res = append(res, err)
 	}
 
-	qLimit, qhkLimit, _ := qs.GetOK("limit")
-	if err := o.bindLimit(qLimit, qhkLimit, route.Formats); err != nil {
-		res = append(res, err)
-	}
-
-	qOffset, qhkOffset, _ := qs.GetOK("offset")
-	if err := o.bindOffset(qOffset, qhkOffset, route.Formats); err != nil {
-		res = append(res, err)
-	}
-
-	qOrderedByMostRecent, qhkOrderedByMostRecent, _ := qs.GetOK("ordered_by_most_recent")
-	if err := o.bindOrderedByMostRecent(qOrderedByMostRecent, qhkOrderedByMostRecent, route.Formats); err != nil {
-		res = append(res, err)
-	}
-
-	qPreload, qhkPreload, _ := qs.GetOK("preload")
-	if err := o.bindPreload(qPreload, qhkPreload, route.Formats); err != nil {
-		res = append(res, err)
-	}
-
 	qTags, qhkTags, _ := qs.GetOK("tags")
 	if err := o.bindTags(qTags, qhkTags, route.Formats); err != nil {
 		res = append(res, err)
@@ -150,7 +114,7 @@ func (o *FindFlagsParams) BindRequest(r *http.Request, route *middleware.Matched
 }
 
 // bindDeleted binds and validates parameter Deleted from query.
-func (o *FindFlagsParams) bindDeleted(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *CountFlagsParams) bindDeleted(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -173,7 +137,7 @@ func (o *FindFlagsParams) bindDeleted(rawData []string, hasKey bool, formats str
 }
 
 // bindDescription binds and validates parameter Description from query.
-func (o *FindFlagsParams) bindDescription(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *CountFlagsParams) bindDescription(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -191,7 +155,7 @@ func (o *FindFlagsParams) bindDescription(rawData []string, hasKey bool, formats
 }
 
 // bindDescriptionLike binds and validates parameter DescriptionLike from query.
-func (o *FindFlagsParams) bindDescriptionLike(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *CountFlagsParams) bindDescriptionLike(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -209,7 +173,7 @@ func (o *FindFlagsParams) bindDescriptionLike(rawData []string, hasKey bool, for
 }
 
 // bindEnabled binds and validates parameter Enabled from query.
-func (o *FindFlagsParams) bindEnabled(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *CountFlagsParams) bindEnabled(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -232,7 +196,7 @@ func (o *FindFlagsParams) bindEnabled(rawData []string, hasKey bool, formats str
 }
 
 // bindIncludeDeleted binds and validates parameter IncludeDeleted from query.
-func (o *FindFlagsParams) bindIncludeDeleted(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *CountFlagsParams) bindIncludeDeleted(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -255,7 +219,7 @@ func (o *FindFlagsParams) bindIncludeDeleted(rawData []string, hasKey bool, form
 }
 
 // bindKey binds and validates parameter Key from query.
-func (o *FindFlagsParams) bindKey(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *CountFlagsParams) bindKey(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -272,100 +236,8 @@ func (o *FindFlagsParams) bindKey(rawData []string, hasKey bool, formats strfmt.
 	return nil
 }
 
-// bindLimit binds and validates parameter Limit from query.
-func (o *FindFlagsParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: false
-	// AllowEmptyValue: false
-
-	if raw == "" { // empty values pass all other validations
-		return nil
-	}
-
-	value, err := swag.ConvertInt64(raw)
-	if err != nil {
-		return errors.InvalidType("limit", "query", "int64", raw)
-	}
-	o.Limit = &value
-
-	return nil
-}
-
-// bindOffset binds and validates parameter Offset from query.
-func (o *FindFlagsParams) bindOffset(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: false
-	// AllowEmptyValue: false
-
-	if raw == "" { // empty values pass all other validations
-		return nil
-	}
-
-	value, err := swag.ConvertInt64(raw)
-	if err != nil {
-		return errors.InvalidType("offset", "query", "int64", raw)
-	}
-	o.Offset = &value
-
-	return nil
-}
-
-// bindOrderedByMostRecent binds and validates parameter OrderedByMostRecent from query.
-func (o *FindFlagsParams) bindOrderedByMostRecent(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: false
-	// AllowEmptyValue: false
-
-	if raw == "" { // empty values pass all other validations
-		return nil
-	}
-
-	value, err := swag.ConvertBool(raw)
-	if err != nil {
-		return errors.InvalidType("ordered_by_most_recent", "query", "bool", raw)
-	}
-	o.OrderedByMostRecent = &value
-
-	return nil
-}
-
-// bindPreload binds and validates parameter Preload from query.
-func (o *FindFlagsParams) bindPreload(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: false
-	// AllowEmptyValue: false
-
-	if raw == "" { // empty values pass all other validations
-		return nil
-	}
-
-	value, err := swag.ConvertBool(raw)
-	if err != nil {
-		return errors.InvalidType("preload", "query", "bool", raw)
-	}
-	o.Preload = &value
-
-	return nil
-}
-
 // bindTags binds and validates parameter Tags from query.
-func (o *FindFlagsParams) bindTags(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *CountFlagsParams) bindTags(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]

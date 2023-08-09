@@ -92,6 +92,14 @@ paths:
           name: deleted
           type: boolean
           description: return all deleted flags
+        - in: query
+          name: include_deleted
+          type: boolean
+          description: return all flags including deleted ones
+        - in: query
+          name: ordered_by_most_recent
+          type: boolean
+          description: return flags ordered by most recently created
       responses:
         '200':
           description: list all the flags
@@ -837,6 +845,49 @@ paths:
           description: generic error response
           schema:
             $ref: '#/definitions/error'
+  /flags/count:
+    get:
+      tags:
+        - flag
+      operationId: countFlags
+      parameters:
+        - in: query
+          name: deleted
+          type: boolean
+          description: count only deleted flags
+        - in: query
+          name: include_deleted
+          type: boolean
+          description: include all deleted flags in the count
+        - in: query
+          name: enabled
+          type: boolean
+          description: count only flags having given enabled status
+        - in: query
+          name: description
+          type: string
+          description: count only flags exactly matching given description
+        - in: query
+          name: description_like
+          type: string
+          description: count only flags partially matching given description
+        - in: query
+          name: key
+          type: string
+          description: count only flags matching given key
+        - in: query
+          name: tags
+          type: string
+          description: count only flags with the given tags (comma separated)
+      responses:
+        '200':
+          description: returns the count of active flags
+          schema:
+            $ref: '#/definitions/count'
+        default:
+          description: generic error response
+          schema:
+            $ref: '#/definitions/error'
   /tags:
     get:
       tags:
@@ -991,6 +1042,8 @@ definitions:
         type: string
         minLength: 1
       enabled:
+        type: boolean
+      isDeleted:
         type: boolean
       tags:
         type: array
@@ -1459,6 +1512,13 @@ definitions:
     properties:
       status:
         type: string
+  count:
+    type: object
+    required:
+      - totalFlags
+    properties:
+      totalFlags:
+        type: integer
   error:
     type: object
     required:
