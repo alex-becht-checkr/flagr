@@ -310,7 +310,7 @@ export default {
             ordered_by_most_recent: true,
             include_deleted: this.includeDeleted,
             limit: this.pageSize,
-            offset: this.currentPage - 1,
+            offset: (this.currentPage - 1) * this.pageSize,
             description_like: this.searchTermDescription,
             tags: this.searchTermTag,
             key: this.searchTermKey,
