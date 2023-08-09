@@ -280,10 +280,17 @@
                   >
                     <div class="flex-row id-row">
                       <div class="flex-row-left">
-                        <div class="flex-row-left">
-                          <el-button @click="segmentUp(segment, flag.segments)">Up</el-button>
-                          <el-button @click="segmentDown(segment, flag.segments)">Down</el-button>
-                        </div>
+                        <el-button size="small"
+                                   @click="segmentUp(segment, flag.segments)">
+                          <span class="el-icon-arrow-up">
+                          </span>
+                        </el-button>
+                        <el-button size="small"
+                                   @click="segmentDown(segment, flag.segments)"
+                                   style="margin-right: 15px">
+                          <span class="el-icon-arrow-down">
+                          </span>
+                        </el-button>
                         <el-tag type="primary" :disable-transitions="true">
                           Segment ID:
                           <b>{{ segment.id }}</b>
