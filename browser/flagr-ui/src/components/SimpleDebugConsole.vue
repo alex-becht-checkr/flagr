@@ -68,6 +68,7 @@
         </el-col>
         <el-col :span="12">
           <div>
+            <div class="card--error" v-if="evalResult.evalDebugLog.msg && evalResult.evalDebugLog.msg.includes('not enabled')">Flag is not enabled</div>
             <el-tag type="primary" :disable-transitions="true">
               Variant ID:
               <b>{{ evalResult.variantID }}</b>
