@@ -3,7 +3,7 @@
     <el-col :span="20" :offset="2">
       <div class="container flag-container">
         <el-button class="fab" type="success" round @click="saveFlag(flag)">
-          Save Flag
+          Save flag
         </el-button>
 
         <el-dialog title="Delete feature flag" :visible.sync="dialogDeleteFlagVisible">
@@ -22,7 +22,7 @@
               <el-slider v-model="newSegment.rolloutPercent" show-input></el-slider>
             </p>
             <el-button class="width--full" :disabled="!newSegment.description" @click.prevent="createSegment">Create
-              Segment</el-button>
+              segment</el-button>
           </div>
         </el-dialog>
 
@@ -44,7 +44,7 @@
               <el-row>
                 <el-col :span="24">
                   <el-input size="small" placeholder="Key" v-model="flag.key">
-                    <template slot="prepend">Flag Key</template>
+                    <template slot="prepend">Flag key</template>
                   </el-input>
                 </el-col>
               </el-row>
@@ -74,7 +74,7 @@
                     placeholder="Description"
                     v-model="flag.description"
                   >
-                    <template slot="prepend">Flag Description</template>
+                    <template slot="prepend">Flag description</template>
                   </el-input>
                 </el-col>
               </el-row>
@@ -84,7 +84,7 @@
           </el-row>
           <el-row style="margin: 10px;">
             <h5>
-              <span style="margin-right: 10px;">Flag Notes</span>
+              <span style="margin-right: 10px;">Flag notes</span>
               <el-button size="mini" @click="toggleShowMdEditor">
                 <span :class="editViewIcon"></span>
                 {{ !this.showMdEditor ? "edit" : "view" }}
@@ -129,7 +129,7 @@
                 class="button-new-tag"
                 size="small"
                 @click="showTagInput"
-              >+ New Tag</el-button>
+              >+ New tag</el-button>
             </div>
           </el-row>          
         </el-card>
@@ -182,11 +182,11 @@
                 <div class="variants-input">
                   <div class="flex-row equal-width constraints-inputs-container">
                     <div>
-                      <el-input placeholder="Variant Key" v-model="newVariant.key"></el-input>
+                      <el-input placeholder="Variant key" v-model="newVariant.key"></el-input>
                     </div>
                   </div>
                   <el-button class="width--full" :disabled="!newVariant.key" @click.prevent="createVariant">Create
-                    Variant</el-button>
+                    variant</el-button>
                 </div>
               </el-card>
 
@@ -205,7 +205,7 @@
                     </h2>
                     </div>
                     <div class="flex-row-right">
-                      <el-button @click="dialogCreateSegmentOpen = true">New Segment</el-button>
+                      <el-button @click="dialogCreateSegmentOpen = true">New segment</el-button>
                     </div>
                   </div>
                 </div>
@@ -232,7 +232,7 @@
                         </el-tag>
                       </div>
                       <div class="flex-row-right">
-                        <el-button size="small" @click="cloneSegment(segment)">Clone Segment</el-button>
+                        <el-button size="small" @click="cloneSegment(segment)">Clone segment</el-button>
                         <el-button @click="deleteSegment(segment)" size="small">
                           <span class="el-icon-delete" />
                         </el-button>
@@ -321,7 +321,7 @@
                                 <el-button class="width--full" size="small" type="primary" plain :disabled="!segment.newConstraint.property ||
                                   !segment.newConstraint.value
                                   " @click.prevent="() => createConstraint(segment)
-    ">Add Constraint</el-button>
+    ">Add constraint</el-button>
                               </el-col>
                             </el-row>
                           </div>
@@ -418,7 +418,7 @@
                   <el-row class="settings-body">
                     <el-button @click="dialogDeleteFlagVisible = true" type="danger" plain>
                       <span class="el-icon-delete"></span>
-                      Delete Flag
+                      Delete flag
                     </el-button>
                   </el-row>
                 </div>

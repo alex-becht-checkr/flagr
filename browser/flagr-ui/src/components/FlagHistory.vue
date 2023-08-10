@@ -11,7 +11,7 @@
           </el-col>
           <el-col :span="12">
             <div style="display: flex; justify-content: flex-end; text-align: center">
-              <span style="font-size:13px; margin-right: 8px;">Compact View</span>
+              <span style="font-size:13px; margin-right: 8px;">Compact view</span>
                 <el-switch
                   v-model="compactView"
                   active-color="#13ce66"
@@ -46,12 +46,12 @@
           sortable>
         </el-table-column>
         <el-table-column
-          label="Updated At"
+          label="Updated at"
           prop="timestamp"
           sortable>
         </el-table-column>
         <el-table-column
-          label="Updated By"
+          label="Updated by"
           prop="updatedBy"
           sortable>
         </el-table-column>

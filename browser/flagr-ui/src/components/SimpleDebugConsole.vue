@@ -33,12 +33,12 @@
           </div>
           <div>
             <el-input size="small" placeholder="Enter Entity Type" v-model="evalContext.entityType">
-              <template slot="prepend">Entity Type</template>
+              <template slot="prepend">Entity type</template>
             </el-input>
           </div>
           <div>
             <div class="tools-debugging-top-description">
-              <span>Entity Context</span>
+              <span>Entity context</span>
             </div>
             <vue-json-editor
                     v-model="evalContext.entityContext"
@@ -73,7 +73,7 @@
               <b>{{ evalResult.variantID }}</b>
             </el-tag>
             <el-tag type="primary" :disable-transitions="true">
-              Variant Key:
+              Variant key:
               <b>{{ evalResult.variantKey }}</b>
             </el-tag>  
             <div v-if="evalResult.variantAttachment">
@@ -88,6 +88,7 @@
                 <el-table
                     :data="evalResult?.evalDebugLog?.segmentDebugLogs"
                     class="segment-debug-logs-table"
+                    empty-text="No data"
                 >
                   <el-table-column
                       prop="segmentID"
@@ -96,7 +97,7 @@
                   </el-table-column>
                   <el-table-column
                       prop="msg"
-                      label="Evaluation Message"
+                      label="Evaluation message"
                   >
                   </el-table-column>
                 </el-table>

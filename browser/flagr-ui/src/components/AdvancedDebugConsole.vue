@@ -1,7 +1,7 @@
 <template>
   <div class="tools-debugging-body">
     <div class="tools-debugging-h4">
-      <span>Single Evaluation
+      <span>Single evaluation
         <el-tooltip placement="bottom" effect="light">
           <div slot="content">Allows you to evaluate a flag of an entity<br>
             to the expected variant using JSON. 
@@ -51,7 +51,7 @@
     </el-row>
 
     <div class="tools-debugging-h4">
-      <span>Batch Evaluation
+      <span>Batch evaluation
         <el-tooltip placement="bottom" effect="light">
           <div slot="content">Allows you to evaluate a group of flags<br>
             or entities in one call using JSON. 
@@ -94,7 +94,7 @@
               @click="emitEvaluateBatch"
               type="primary"
               plain
-          >Batch Evaluate
+          >Batch evaluate
           </el-button>
         </div>
       </el-col>

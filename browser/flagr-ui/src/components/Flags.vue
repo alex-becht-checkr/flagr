@@ -84,13 +84,13 @@
                   </component>
                 </template>
               </el-table-column>
-              <el-table-column prop="updatedBy" label="Last Updated By" sortable width="200">
+              <el-table-column prop="updatedBy" label="Last updated by" sortable width="200">
                 <template slot-scope="scope">
                   <component :is="scope.row.isDeleted?'span':'a'" :href=getFlagUri(scope.row)>{{ scope.row.updatedBy }}
                   </component>
                 </template>
               </el-table-column>
-              <el-table-column prop="updatedAt" label="Updated At" :formatter="datetimeFormatter" sortable width="180">
+              <el-table-column prop="updatedAt" label="Updated at" :formatter="datetimeFormatter" sortable width="180">
                 <template slot-scope="scope">
                   <component :is="scope.row.isDeleted?'span':'a'" :href=getFlagUri(scope.row)>{{
                     datetimeFormatter(scope.row.updatedAt) }}</component>
