@@ -21,48 +21,44 @@
                   <el-button slot="append" icon="el-icon-search" @click="onEnter"></el-button>
                 </el-input>
               </div>
+              
             </el-row>
             <el-row>
               <el-tag v-if="searchTermTag" :key="searchTermTag" closable @close="searchTermTag = ''">
-                tag:{{ searchTermTag }}
+                Tag:{{ searchTermTag }}
               </el-tag>
               <el-tag v-if="searchTermDescription" :key="searchTermDescription" closable
                 @close="searchTermDescription = ''" type="success">
-                description:{{ searchTermDescription }}
+                Description:{{ searchTermDescription }}
               </el-tag>
               <el-tag v-if="searchTermKey" :key="searchTermKey" closable @close="searchTermKey = ''" type="warning">
-                key:{{ searchTermKey }}
+                Key:{{ searchTermKey }}
               </el-tag>
-              <el-button type="text" @click="clearSearchTerm" v-if="searchTermDescription || searchTermKey || searchTermTag">Clear Search</el-button>
+              <el-button type="text" @click="clearSearchTerm" v-if="searchTermDescription || searchTermKey || searchTermTag">Clear search</el-button>
             </el-row>
             <el-row>
               <div style="margin-top: 15px;">
-                <el-col :span="2">
-                  <h5 class="filter-label">Filter by Status:</h5>
-                </el-col>
-                <el-col :span="5">
-                  <el-radio-group v-model="statusFilterRadioValue" @change="(e) => onStatusFilterChange(e)">
-                    <el-radio :label="1">Enabled</el-radio>
-                    <el-radio :label="2">Disabled</el-radio>
-                    <el-radio :label="3">Both</el-radio>
+                <h5 class="filter-label">Filter by:</h5>
+                <div class="filter-group">
+                  <el-radio-group v-model="statusFilterRadioValue" size="small" @change="(e) => onStatusFilterChange(e)">
+                    <el-radio-button :label="1">Enabled</el-radio-button>
+                    <el-radio-button :label="2">Disabled</el-radio-button>
+                    <el-radio-button :label="3">Both</el-radio-button>
                   </el-radio-group>
-                </el-col>
-                <el-col :span="2">
-                  <h5 class="filter-label">Filter by Type:</h5>
-                </el-col>
-                <el-col :span="5">
-                  <el-radio-group v-model="typeFilterRadioValue" @change="(e) => onTypeFilterChange(e)">
-                    <el-radio :label="1">Active</el-radio>
-                    <el-radio :label="2">Deleted</el-radio>
-                    <el-radio :label="3">Both</el-radio>
+                </div>
+                <div class="filter-group">
+                  <el-radio-group v-model="typeFilterRadioValue" size="small" @change="(e) => onTypeFilterChange(e)">
+                    <el-radio-button :label="1">Active</el-radio-button>
+                    <el-radio-button :label="2">Deleted</el-radio-button>
+                    <el-radio-button :label="3">Both</el-radio-button>
                   </el-radio-group>
-                </el-col>
+                </div>
               </div>
             </el-row>
 
             <el-table :data="flags" :stripe="true" :highlight-current-row="false"
               :default-sort="{ prop: 'id', order: 'descending' }" style="width: 100%">
-              <el-table-column prop="id" align="center" label="ID" sortable fixed width="65">
+              <el-table-column prop="id" align="center" label="ID" sortable width="65">
                 <template slot-scope="scope">
                   <component :is="scope.row.isDeleted?'span':'a'" :href=getFlagUri(scope.row)
                     style="justify-content: center;">{{ scope.row.id }}</component>
@@ -100,14 +96,14 @@
                     datetimeFormatter(scope.row.updatedAt) }}</component>
                 </template>
               </el-table-column>
-              <el-table-column prop="enabled" label="Enabled" sortable align="center" fixed="right" width="140">
+              <el-table-column prop="enabled" label="Enabled" sortable align="center" width="140">
                 <template slot-scope="scope">
                   <el-tag :type="scope.row.enabled ? 'primary' : 'danger'" disable-transitions>{{ scope.row.enabled ? "on"
                     :
                     "off" }}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="action" label="Action" align="center" fixed="right" width="100" v-if="onlyDeleted || includeDeleted">
+              <el-table-column prop="action" label="Action" align="center" width="100" v-if="onlyDeleted || includeDeleted">
                 <template slot-scope="scope">
                   <el-button @click="restoreFlag(scope.row)" size="small" type="warning"
                     v-if="scope.row.isDeleted">Restore</el-button>
@@ -131,7 +127,7 @@
                icon="el-icon-plus"
                round
                @click="showFlagCreator = true">
-      Create Flag
+                Create Flag
     </el-button>
     <el-dialog title="Create New Flag" :visible.sync="showFlagCreator">
       <el-form>
@@ -453,6 +449,20 @@ export default {
 
   .filter-label {
     margin: 1px 0 5px;
+    display: inline;
+  }
+  
+  .filter-group {
+    padding: 0 5px;
+    display: inline-block;
+  }
+
+  .el-pagination {
+    font-weight: 400;
+  }
+
+  .el-pager li.active {
+    font-weight: 700;
   }
 }
 </style>

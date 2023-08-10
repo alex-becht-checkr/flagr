@@ -248,7 +248,7 @@ ol {
     box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
     z-index: 999;
   }
-  
+
   .align-right {
     text-align: right;
   }
