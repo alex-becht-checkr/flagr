@@ -8,9 +8,6 @@
               <router-link :to="{ name: 'home' }">
                 <div class="logo-container">
                   <h3 class="logo">Flagr</h3>
-                  <div>
-                    <span class="version">v{{ version }}</span>
-                  </div>
                 </div>
               </router-link>
             </el-col>
@@ -31,6 +28,15 @@
     <div class="router-view-container">
       <router-view></router-view>
     </div>
+    <el-row>
+      <el-menu mode="horizontal" class="footer">
+        <el-row>
+          <div>
+            <span>v{{ version }}</span>
+          </div>
+        </el-row>
+      </el-menu>
+    </el-row>
   </div>
 </template>
 
@@ -109,6 +115,24 @@ ol {
       }
     }
   }
+
+  .router-view-container {
+    margin-bottom: 50px;
+  }
+
+  .footer {
+      background-color: #74e5e0;
+      color: #2e4960;
+      border: 0;
+      text-align: center;
+      padding: 10px;
+      margin-top: 20px;
+      position: absolute;
+      justify-content: center;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
 
   .flex-row {
     display: flex;
