@@ -217,6 +217,14 @@ ol {
     margin: 2.5px;
   }
 
+  .fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+  }
+  
   .align-right {
     text-align: right;
   }

@@ -126,8 +126,13 @@
         </div>
       </el-col>
     </el-row>
-    <el-button class="fab" type="success" icon="el-icon-plus" round @click="showFlagCreator = true">Create
-      Flag</el-button>
+    <el-button class="fab"
+               type="success"
+               icon="el-icon-plus"
+               round
+               @click="showFlagCreator = true">
+      Create Flag
+    </el-button>
     <el-dialog title="Create New Flag" :visible.sync="showFlagCreator">
       <el-form>
         <el-form-item label="Flag Description">
@@ -440,14 +445,6 @@ export default {
   .filter-label {
     margin: 1px 0 5px;
   }
-}
-
-.fab {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  box-shadow: 1px 1px rgba(0, 0, 0, 0.2);
-  z-index: 999;
 }
 </style>
 

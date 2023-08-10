@@ -2,6 +2,10 @@
   <el-row>
     <el-col :span="20" :offset="2">
       <div class="container flag-container">
+        <el-button class="fab" type="success" round @click="saveFlag(flag)">
+          Save Flag
+        </el-button>
+
         <el-dialog title="Delete feature flag" :visible.sync="dialogDeleteFlagVisible">
           <span>Are you sure you want to delete this feature flag?</span>
           <span slot="footer" class="dialog-footer">
@@ -48,7 +52,6 @@
                 <el-tag type="primary" :disable-transitions="true">Flag ID: {{ $route.params.flagId }}</el-tag>
               </div>
               <div class="flex-row-right">
-                <el-button size="small" @click="saveFlag(flag)">Save Flag</el-button>
               </div>
             </div>
             <el-row class="flag-content" type="flex" align="middle">
@@ -93,8 +96,8 @@
             </el-row>
             <el-row>
               <div class="tags-container-inner">
-                <el-tag v-for="tag in flag.tags" :key="tag.id" closable :type="warning"
-                  @close="deleteTag(tag)">{{ tag.value }}</el-tag>
+                <el-tag v-for="tag in flag.tags" :key="tag.id" closable :type="warning" @close="deleteTag(tag)">{{
+                  tag.value }}</el-tag>
                 <el-autocomplete class="tag-key-input" v-if="tagInputVisible" v-model="newTag.value" ref="saveTagInput"
                   size="mini" :trigger-on-focus="false" :fetch-suggestions="queryTags" @select="createTag"
                   @keyup.enter.native="createTag" @keyup.esc.native="cancelCreateTag"></el-autocomplete>
@@ -488,7 +491,9 @@ export default {
     saveFlag(flag) {
       for (var segment of flag.segments) {
         segment.rolloutPercent = parseInt(segment.rolloutPercent);
-        segment.constraint = this.formatConstraint(segment.constraint);
+        if (segment.constraint && segment.constraint.operator && segment.constraint.value) {
+          segment.constraint = this.formatConstraint(segment.constraint);
+        }
       }
       Axios.put(`${API_URL}/flags/${this.flagId}/full`, flag)
         .then(() => {
