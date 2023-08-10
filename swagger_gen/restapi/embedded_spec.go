@@ -2143,8 +2143,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "value": {
           "type": "string",
@@ -4366,8 +4365,7 @@ func init() {
         "id": {
           "type": "integer",
           "format": "int64",
-          "minimum": 1,
-          "readOnly": true
+          "minimum": 1
         },
         "value": {
           "type": "string",

@@ -20,7 +20,6 @@ import (
 type Tag struct {
 
 	// id
-	// Read Only: true
 	// Minimum: 1
 	ID int64 `json:"id,omitempty"`
 
@@ -73,26 +72,8 @@ func (m *Tag) validateValue(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this tag based on the context it is used
+// ContextValidate validates this tag based on context it is used
 func (m *Tag) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateID(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Tag) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
-
-	if err := validate.ReadOnly(ctx, "id", "body", int64(m.ID)); err != nil {
-		return err
-	}
-
 	return nil
 }
 
