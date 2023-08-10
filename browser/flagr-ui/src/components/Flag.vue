@@ -37,9 +37,6 @@
               <div class="flex-row-left">
                 <h2>Flag ID: {{ $route.params.flagId }}</h2>
               </div>
-              <div class="flex-row-right">
-                <el-button size="small" @click="putFlag(flag)">Save Flag</el-button>
-              </div>
             </div>
           </div>
           <el-row class="flag-content" type="flex" align="middle">
