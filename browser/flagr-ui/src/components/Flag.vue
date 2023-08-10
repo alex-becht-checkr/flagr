@@ -9,51 +9,6 @@
             <el-button type="primary" @click.prevent="deleteFlag">Confirm</el-button>
           </span>
         </el-dialog>
-
-        <el-dialog title="Edit distribution" :visible.sync="dialogEditDistributionOpen">
-          <div v-if="loaded && flag">
-            <div v-for="variant in flag.variants" :key="'distribution-variant-' + variant.id">
-              <div>
-                <el-checkbox
-                  @change="(e) => selectVariant(e, variant)"
-                  :checked="!!newDistributions[variant.id]"
-                ></el-checkbox>
-                <el-tag type="danger" :disable-transitions="true">{{ variant.key }}</el-tag>
-              </div>
-              <el-slider
-                v-if="!newDistributions[variant.id]"
-                :value="0"
-                :disabled="true"
-                show-input
-              ></el-slider>
-              <div v-if="!!newDistributions[variant.id]">
-                <el-slider
-                  v-model="newDistributions[variant.id].percent"
-                  :disabled="false"
-                  show-input
-                ></el-slider>
-              </div>
-            </div>
-          </div>
-          <el-button
-            class="width--full"
-            :disabled="!newDistributionIsValid"
-            @click.prevent="() => saveDistribution(selectedSegment)"
-          >Save</el-button>
-
-          <el-alert
-            class="edit-distribution-alert"
-            v-if="!newDistributionIsValid"
-            :title="
-              'Percentages must add up to 100% (currently at ' +
-              newDistributionPercentageSum +
-              '%)'
-            "
-            type="error"
-            show-icon
-          ></el-alert>
-        </el-dialog>
-
         <el-dialog title="Create segment" :visible.sync="dialogCreateSegmentOpen">
           <div>
             <p>
@@ -424,7 +379,8 @@
                                 </el-select>
                               </el-col>
                               <el-col :span="11">
-                                <el-input size="small" v-model="segment.newConstraint.value"></el-input>
+                                <el-input v-if="listConstraint(segment.newConstraint)" type="textarea" autosize v-model="segment.newConstraint.value"></el-input>
+                                <el-input v-else size="small" v-model="segment.newConstraint.value"></el-input>
                               </el-col>
                               <el-col :span="4">
                                 <el-button
@@ -448,35 +404,42 @@
                       <el-col :span="24" class="segment-distributions">
                         <h5>
                           <span>Distribution</span>
-                          <el-button round size="mini" @click="editDistribution(segment)">
-                            <span class="el-icon-edit"></span> edit
-                          </el-button>
                         </h5>
-                        <el-row type="flex" v-if="segment.distributions.length" :gutter="20">
-                          <el-col
-                            v-for="distribution in segment.distributions"
-                            :key="distribution.id"
-                            :span="6"
-                          >
-                            <el-card shadow="never" class="distribution-card">
-                              <div>
-                                <span size="small">
-                                  {{
-                                  distribution.variantKey
-                                  }}
-                                </span>
-                              </div>
-                              <el-progress
-                                type="circle"
-                                color="#74E5E0"
-                                :width="70"
-                                :percentage="distribution.percent"
-                              ></el-progress>
-                            </el-card>
+                        <el-row v-for="variant in flag.variants" :key="variant.id" class="variant-row" :gutter="20">
+                          <el-col :span="6">
+                            <el-input
+                              class="variant-key-input segment-distribution-variant"
+                              size="small"
+                              placeholder="rollout"
+                              type="number"
+                              :min="0"
+                              :max="100"
+                              :value="getDistributionValue(segment, variant)"
+                              @input="value => setDistributionValue(value, segment, variant)"
+                            >
+                              <template slot="prepend">{{ variant.key }}</template>
+                              <template slot="append">%</template>
+                            </el-input>
+                          </el-col>
+                          <el-col :span="18">
+                            <el-progress color="#74E5E0" :percentage="Math.max(0, Math.min(100, getDistributionValue(segment, variant)))"></el-progress>
                           </el-col>
                         </el-row>
-
-                        <div class="card--error" v-else>No distribution yet</div>
+                        <el-alert
+                          v-if="sumDistributions(segment.distributions) !== 100"
+                          class="edit-distribution-alert"
+                          :title="
+                            'Percentages must add up to 100% (currently at ' +
+                            sumDistributions(segment.distributions) +
+                            '%)'
+                          "
+                          type="error"
+                          :closable="false"
+                          show-icon
+                        ></el-alert>
+                        <el-row v-else>
+                          <el-col :offset="21" :span="3"><el-button size="small" class="save-distributions" @click="saveDistribution(segment)">Save Distributions</el-button></el-col>
+                        </el-row>
                       </el-col>
                     </el-row>
                   </el-card>
@@ -614,7 +577,6 @@ export default {
     return {
       loaded: false,
       dialogDeleteFlagVisible: false,
-      dialogEditDistributionOpen: false,
       dialogCreateSegmentOpen: false,
       entityTypes: [],
       allTags: [],
@@ -637,7 +599,6 @@ export default {
       newSegment: clone(DEFAULT_SEGMENT),
       newVariant: clone(DEFAULT_VARIANT),
       newTag: clone(DEFAULT_TAG),
-      selectedSegment: null,
       newDistributions: {},
       operatorOptions: operators,
       operatorValueToLabelMap: OPERATOR_VALUE_TO_LABEL_MAP,
@@ -710,34 +671,19 @@ export default {
         this.$delete(this.newDistributions, variant.id);
       }
     },
-    editDistribution(segment) {
-      this.selectedSegment = segment;
-
-      this.$set(this, "newDistributions", {});
-
-      segment.distributions.forEach(distribution => {
-        this.$set(
-          this.newDistributions,
-          distribution.variantID,
-          clone(distribution)
-        );
-      });
-
-      this.dialogEditDistributionOpen = true;
-    },
     saveDistribution(segment) {
-      const distributions = Object.values(this.newDistributions).filter(
+      const distributions = Object.values(segment.distributions).filter(
         distribution => distribution.percent !== 0
       ).map(distribution => {
-        let dist = clone(distribution)
+        const dist = clone(distribution)
         delete dist.id;
         return dist
       });
 
       this.putDistributions(segment.id, distributions).then(response => {
         let distributions = response.data;
-        this.selectedSegment.distributions = distributions;
-        this.dialogEditDistributionOpen = false;
+        segment.distributions = distributions;
+        console.log('success');
         this.$message.success("distributions updated");
       });
     },
@@ -958,6 +904,10 @@ export default {
         let segment = response.data;
         processSegment(segment);
         segment.constraints = [];
+        if (this.flag.variants.length) {
+          // default the first variant to 100%
+          this.setDistributionValue(100, segment, this.flag.variants[0]);
+        }
         this.newSegment = clone(DEFAULT_SEGMENT);
         this.flag.segments.push(segment);
         this.$message.success("new segment created");
@@ -1011,7 +961,31 @@ export default {
     },
     toggleShowMdEditor() {
       this.showMdEditor = !this.showMdEditor;
-    }
+    },
+    sumDistributions(distributions) {
+      return distributions.reduce((current, { percent }) => current+percent, 0);
+    },
+    getDistributionValue(segment, variant) {
+      const distribution = segment.distributions.find(d => d.variantID === variant.id);
+      return distribution ? distribution.percent : 0;
+    },
+    setDistributionValue(value, segment, variant) {
+      const percent = parseInt(value, 10);
+      console.log({ segment, variant, percent });
+      const distribution = segment.distributions.find(d => d.variantID === variant.id);
+      if (distribution) {
+        console.log("updating")
+        distribution.percent = percent;
+      } else {
+        console.log("adding")
+        const newDistribution = {
+          variantID: variant.id,
+          variantKey: variant.key,
+          percent,
+        };
+        segment.distributions.push(newDistribution);
+      }
+    },
   },
   mounted() {
     this.fetchFlag();
@@ -1079,6 +1053,38 @@ ol.constraints-inner {
   }
   .el-input-group__prepend {
     width: 2em;
+  }
+}
+
+.segment-distributions {
+  .variant-key-input {
+    width: auto;
+  }
+  .el-row {
+    margin-top: 10px;
+  }
+  .save-distributions {
+    margin: 10px;
+  }
+  .el-input-group {
+    input {
+      width: 80px;
+    }
+    .el-input-group__prepend {
+    width: 100%;
+    max-width: 100px;
+    text-align: end;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    }
+  }
+  .el-progress {
+    display: flex;
+    align-items: center;
+    height: 32px;
+  }
+  .el-alert {
+    margin: 10px;
   }
 }
 
