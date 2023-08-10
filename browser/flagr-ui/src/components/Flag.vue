@@ -309,12 +309,14 @@
                           </div>
                         </div>
                       </el-col>
-                      <el-col :span="24" class="segment-distributions">
+                      <el-col :span="24">
                         <h5>
                           <span>Distribution</span>
                         </h5>
-                        <el-row v-for="variant in flag.variants" :key="variant.id" class="variant-row" :gutter="20">
-                          <el-col :span="6">
+                      </el-col>
+                      </el-row>
+                        <el-row v-for="variant in flag.variants" :key="variant.id" :gutter="20">
+                          <el-col :span="24" class="segment-distribution">
                             <el-input class="variant-key-input segment-distribution-variant" size="small"
                               placeholder="rollout" type="number" :min="0" :max="100"
                               :value="getDistributionValue(segment, variant)"
@@ -322,23 +324,19 @@
                               <template slot="prepend">{{ variant.key }}</template>
                               <template slot="append">%</template>
                             </el-input>
-                          </el-col>
-                          <el-col :span="18">
                             <el-progress color="#74E5E0"
                               :percentage="Math.max(0, Math.min(100, getDistributionValue(segment, variant)))"></el-progress>
                           </el-col>
                         </el-row>
-                        <el-alert v-if="sumDistributions(segment.distributions) !== 100" class="edit-distribution-alert"
-                          :title="'Percentages must add up to 100% (currently at ' +
-                            sumDistributions(segment.distributions) +
-                            '%)'
-                            " type="error" :closable="false" show-icon></el-alert>
-                        <el-row v-else>
-                          <el-col :offset="21" :span="3"><el-button size="small" class="save-distributions"
-                              @click="saveDistribution(segment)">Save Distributions</el-button></el-col>
+                        <el-row v-if="sumDistributions(segment.distributions) !== 100">
+                          <el-col :span="24" class="segment-distribution-alert">
+                            <el-alert  class="edit-distribution-alert"
+                              :title="'Percentages must add up to 100% (currently at ' +
+                                sumDistributions(segment.distributions) +
+                                '%)'
+                                " type="error" :closable="false" show-icon></el-alert>
+                          </el-col>
                         </el-row>
-                      </el-col>
-                    </el-row>
                   </el-card>
                 </div>
                 <div class="card--error" v-else>No segments created for this feature flag yet</div>
@@ -977,17 +975,12 @@ ol.constraints-inner {
   }
 }
 
-.segment-distributions {
+.segment-distribution {
+  margin-top: 10px;
+  display: flex;
+
   .variant-key-input {
-    width: auto;
-  }
-
-  .el-row {
-    margin-top: 10px;
-  }
-
-  .save-distributions {
-    margin: 10px;
+    width: 275px;
   }
 
   .el-input-group {
@@ -1005,13 +998,17 @@ ol.constraints-inner {
   }
 
   .el-progress {
+    flex-grow: 1;
+    margin-left: 10px;
     display: flex;
     align-items: center;
     height: 32px;
   }
-
-  .el-alert {
-    margin: 10px;
+}
+.segment-distribution-alert {
+  margin: 10px;
+  .el-alert{
+    width: calc(100% - 30px);
   }
 }
 
