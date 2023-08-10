@@ -3,10 +3,24 @@
     <div class="tools-debugging-body">
       <el-row :gutter="20" style="margin-bottom: 8px;" class="tools-debugging-subheader">
         <el-col :span="12" >
-          <span><b>Request</b></span>
+          <span>
+            <b>Request</b>
+            <el-tooltip placement="bottom" effect="light">
+                <div slot="content">Sends your identified entity information<br>to the API to run a test evaluation.
+                </div>
+              <span class="el-icon-info" style="vertical-align: middle; margin-left: 5px;"></span>
+            </el-tooltip>
+          </span>
         </el-col>
         <el-col :span="12">
-          <span><b>Response</b></span>
+          <span>
+            <b>Response</b>
+            <el-tooltip placement="bottom" effect="light">
+                <div slot="content">The output of your <b>Request</b>
+                </div>
+              <span class="el-icon-info" style="vertical-align: middle; margin-left: 5px;"></span>
+            </el-tooltip>
+          </span>
         </el-col>
       </el-row>
 

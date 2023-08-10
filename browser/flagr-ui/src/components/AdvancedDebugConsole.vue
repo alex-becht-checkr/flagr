@@ -1,7 +1,14 @@
 <template>
   <div class="tools-debugging-body">
     <div class="tools-debugging-h4">
-      <span>Single Evaluation</span>
+      <span>Single Evaluation
+        <el-tooltip placement="bottom" effect="light">
+          <div slot="content">Allows you to evaluate a flag of an entity<br>
+            to the expected variant using JSON. 
+          </div>
+          <span class="el-icon-info" style="vertical-align: middle"></span>
+        </el-tooltip>
+      </span>
     </div>  
     <el-row :gutter="10" style="margin-bottom: 8px;" class="tools-debugging-subheader">
       <el-col :span="6">
@@ -44,7 +51,14 @@
     </el-row>
 
     <div class="tools-debugging-h4">
-      <span>Batch Evaluation</span>
+      <span>Batch Evaluation
+        <el-tooltip placement="bottom" effect="light">
+          <div slot="content">Allows you to evaluate a group of flags<br>
+            or entities in one call using JSON. 
+          </div>
+          <span class="el-icon-info" style="vertical-align: middle"></span>
+        </el-tooltip>
+      </span>
     </div>  
     <el-row :gutter="10" style="margin-bottom: 8px;" class="tools-debugging-subheader">
       <el-col :span="6">

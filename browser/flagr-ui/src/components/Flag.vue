@@ -142,7 +142,14 @@
             <el-tab-pane label="Configuration">
               <el-card class="variants-container base-card">
                 <div slot="header" class="clearfix">
-                  <h2>Variants</h2>
+                  <h2>Variants
+                      <el-tooltip placement="bottom" effect="light">
+                        <div slot="content">Potential outputs being evaluated<br>
+                          by this flag.
+                        </div>
+                        <span class="el-icon-info" style="vertical-align: middle; font-size: 1rem;"></span>
+                      </el-tooltip>
+                  </h2>
                 </div>
                 <div class="variants-container-inner" v-if="flag.variants.length">
                   <div v-for="variant in flag.variants" :key="variant.id">
@@ -189,8 +196,16 @@
               <el-card class="segments-container base-card">
                 <div slot="header" class="el-card-header">
                   <div class="flex-row">
-                    <div class="flex-row-left">
-                      <h2>Segments</h2>
+                    <div class="flex-row">
+                      <h2>Segments
+                      <el-tooltip placement="bottom" effect="light">
+                        <div slot="content">How each variant is being evaluated.<br>
+                          A variant must match all constraints<br>
+                          within a segment or it will be passed<br>
+                          to the next segment.</div>
+                        <span class="el-icon-info" style="vertical-align: middle; font-size: 1rem;"></span>
+                      </el-tooltip>
+                    </h2>
                     </div>
                     <div class="flex-row-right">
                       <el-button @click="dialogCreateSegmentOpen = true">New Segment</el-button>
@@ -242,7 +257,13 @@
                     </el-row>
                     <el-row>
                       <el-col :span="24">
-                        <h5>Constraints (match ALL of them)</h5>
+                        <h5>Constraints (match ALL of them)
+                          <el-tooltip placement="bottom" effect="light">
+                            <div slot="content">Used to validate if a particular segment<br>
+                              is eligible to be matched with a variant.</div>
+                            <span class="el-icon-info" style="vertical-align: middle;"></span>
+                          </el-tooltip>
+                        </h5>
                         <div class="constraints">
                           <div class="constraints-inner" v-if="segment.constraints.length">
                             <div v-for="constraint in segment.constraints" :key="constraint.id">
@@ -312,6 +333,12 @@
                       <el-col :span="24">
                         <h5>
                           <span>Distribution</span>
+                          <el-tooltip placement="bottom" effect="light">
+                            <div slot="content">The possibility (in percentage) a specific<br>
+                              variant will be served to a member of that<br>
+                              segment if all its constraints are met.</div>
+                            <span class="el-icon-info" style="margin-left: 5px; vertical-align: middle;"></span>
+                          </el-tooltip>
                         </h5>
                       </el-col>
                       </el-row>
