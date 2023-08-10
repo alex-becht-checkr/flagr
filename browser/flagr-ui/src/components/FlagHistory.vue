@@ -1,21 +1,42 @@
 <template>
   <div>
-    <el-card class="snapshot-container">
-      Compact View
-      <el-switch
-        v-model="compactView"
-        active-color="#13ce66"
-        inactive-color="#ff4949"
-        :active-value="true"
-        :inactive-value="false"
-      ></el-switch>
+    <el-card class="snapshot-container" style="border: 0px;">
+      <div>
+
+        <el-row>
+          <el-col :span="12">
+            <div class="tools-debugging-h3">
+              <span>Change history</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div style="display: flex; justify-content: flex-end; text-align: center"> 
+              <span style="font-size:13px; margin-right: 8px;">Compact View</span>
+              <el-tooltip content="Enable/Disable Flag" placement="top" effect="light">
+                <el-switch
+                  v-model="compactView"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  @change="setFlagEnabled"
+                  :active-value="true"
+                  :inactive-value="false"
+                ></el-switch>
+              </el-tooltip>
+            </div>
+          </el-col>
+        </el-row>
+        <el-divider></el-divider>
+
+      </div>
       <el-table
         :data="diffs"
         :default-sort = "{prop: 'newId', order: 'descending'}"
         stripe
         row-key="newId"
         :expand-row-keys=[latestSnapshot]
-        style="width: 100%">
+        style="width: 100%"
+        class="segment-debug-logs-table"
+        >
         <el-table-column type="expand">
           <template slot-scope="props">
             <pre v-if="compactView" class="diff" v-html="props.row.flagDiff[1]"></pre>

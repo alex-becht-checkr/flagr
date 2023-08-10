@@ -1,11 +1,11 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="20" :offset="2">
-        <div class="flags-container container">
-          <el-breadcrumb separator="/" v-if="loaded">
-            <el-breadcrumb-item>Home page</el-breadcrumb-item>
-          </el-breadcrumb>
+    <el-col :span="20" :offset="2">
+      <div class="flags-container container">
+        <el-breadcrumb separator="/" v-if="loaded">
+          <el-breadcrumb-item><i style="margin-right: 5px;" class="el-icon-s-home" />Home</el-breadcrumb-item>
+        </el-breadcrumb>
 
           <spinner v-if="!loaded" />
 

@@ -27,84 +27,114 @@
         </el-dialog>
 
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ name: 'home' }">Home page</el-breadcrumb-item>
-          <el-breadcrumb-item>Flag ID: {{ $route.params.flagId }}</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ name: 'home' }"><i style="margin-right: 5px;" class="el-icon-s-home" />Home</el-breadcrumb-item>
+          <el-breadcrumb-item>Flag</el-breadcrumb-item>
         </el-breadcrumb>
 
         <el-card class="flag-config-card base-card">
           <div slot="header" class="el-card-header">
             <div class="flex-row">
               <div class="flex-row-left">
-                <h2>Flag</h2>
+                <h2>Flag ID: {{ $route.params.flagId }}</h2>
               </div>
               <div class="flex-row-right">
-                Enabled
-                <el-tooltip content="Enable/Disable Flag" placement="top" effect="light">
-                  <el-switch v-model="flag.enabled" active-color="#13ce66" inactive-color="#ff4949"
-                    @change="setFlagEnabled" :active-value="true" :inactive-value="false"></el-switch>
-                </el-tooltip>
+                <el-button size="small" @click="putFlag(flag)">Save Flag</el-button>
               </div>
             </div>
           </div>
-          <el-card shadow="hover" :class="toggleInnerConfigCard">
-            <div class="flex-row id-row">
-              <div class="flex-row-left">
-                <el-tag type="primary" :disable-transitions="true">Flag ID: {{ $route.params.flagId }}</el-tag>
+          <el-row class="flag-content" type="flex" align="middle">
+            <el-col :span="17">
+              <el-row>
+                <el-col :span="24">
+                  <el-input size="small" placeholder="Key" v-model="flag.key">
+                    <template slot="prepend">Flag Key</template>
+                  </el-input>
+                </el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="7">
+              <div style="display: flex; justify-content: flex-end; text-align: center"> 
+                <span style="font-size:13px; margin-right: 8px;">Enabled</span>
+                <el-tooltip content="Enable/Disable Flag" placement="top" effect="light">
+                  <el-switch
+                    v-model="flag.enabled"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    @change="setFlagEnabled"
+                    :active-value="true"
+                    :inactive-value="false"
+                  ></el-switch>
+                </el-tooltip>
               </div>
-              <div class="flex-row-right">
-              </div>
+            </el-col>
+          </el-row>
+          <el-row class="flag-content" type="flex" align="middle">
+            <el-col :span="17">
+              <el-row>
+                <el-col :span="24">
+                  <el-input
+                    size="small"
+                    placeholder="Description"
+                    v-model="flag.description"
+                  >
+                    <template slot="prepend">Flag Description</template>
+                  </el-input>
+                </el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="7">
+            </el-col>
+          </el-row>
+          <el-row style="margin: 10px;">
+            <h5>
+              <span style="margin-right: 10px;">Flag Notes</span>
+              <el-button size="mini" @click="toggleShowMdEditor">
+                <span :class="editViewIcon"></span>
+                {{ !this.showMdEditor ? "edit" : "view" }}
+              </el-button>
+            </h5>
+          </el-row>
+          <el-row>
+            <markdown-editor
+              :showEditor="this.showMdEditor"
+              :markdown.sync="flag.notes"
+              @save="putFlag(flag)"
+            ></markdown-editor>
+          </el-row>
+          <el-row style="margin: 10px;">
+            <h5>
+              <span style="margin-right: 10px;">Tags</span>
+            </h5>
+          </el-row>
+          <el-row>
+            <div class="tags-container-inner">
+              <el-tag
+                v-for="tag in flag.tags"
+                :key="tag.id"
+                closable
+                :type="warning"
+                @close="deleteTag(tag)"
+              >{{tag.value}}</el-tag>
+              <el-autocomplete
+                class="tag-key-input"
+                v-if="tagInputVisible"
+                v-model="newTag.value"
+                ref="saveTagInput"
+                size="mini"
+                :trigger-on-focus="false"
+                :fetch-suggestions="queryTags"
+                @select="createTag"
+                @keyup.enter.native="createTag"
+                @keyup.esc.native="cancelCreateTag"
+              ></el-autocomplete>
+              <el-button
+                v-else
+                class="button-new-tag"
+                size="small"
+                @click="showTagInput"
+              >+ New Tag</el-button>
             </div>
-            <el-row class="flag-content" type="flex" align="middle">
-              <el-col :span="17">
-                <el-row>
-                  <el-col :span="24">
-                    <el-input size="small" placeholder="Key" v-model="flag.key">
-                      <template slot="prepend">Flag Key</template>
-                    </el-input>
-                  </el-col>
-                </el-row>
-              </el-col>
-            </el-row>
-            <el-row class="flag-content" type="flex" align="middle">
-              <el-col :span="17">
-                <el-row>
-                  <el-col :span="24">
-                    <el-input size="small" placeholder="Description" v-model="flag.description">
-                      <template slot="prepend">Flag Description</template>
-                    </el-input>
-                  </el-col>
-                </el-row>
-              </el-col>
-            </el-row>
-            <el-row style="margin: 10px;">
-              <h5>
-                <span style="margin-right: 10px;">Flag Notes</span>
-                <el-button round size="mini" @click="toggleShowMdEditor">
-                  <span :class="editViewIcon"></span>
-                  {{ !this.showMdEditor ? "edit" : "view" }}
-                </el-button>
-              </h5>
-            </el-row>
-            <el-row>
-              <markdown-editor :showEditor="this.showMdEditor" :markdown.sync="flag.notes"
-                @save="putFlag(flag)"></markdown-editor>
-            </el-row>
-            <el-row style="margin: 10px;">
-              <h5>
-                <span style="margin-right: 10px;">Tags</span>
-              </h5>
-            </el-row>
-            <el-row>
-              <div class="tags-container-inner">
-                <el-tag v-for="tag in flag.tags" :key="tag.id" closable :type="warning" @close="deleteTag(tag)">{{
-                  tag.value }}</el-tag>
-                <el-autocomplete class="tag-key-input" v-if="tagInputVisible" v-model="newTag.value" ref="saveTagInput"
-                  size="mini" :trigger-on-focus="false" :fetch-suggestions="queryTags" @select="createTag"
-                  @keyup.enter.native="createTag" @keyup.esc.native="cancelCreateTag"></el-autocomplete>
-                <el-button v-else class="button-new-tag" size="small" @click="showTagInput">+ New Tag</el-button>
-              </div>
-            </el-row>
-          </el-card>
+          </el-row>          
         </el-card>
 
         <div v-if="loaded && flag">
@@ -116,7 +146,7 @@
                 </div>
                 <div class="variants-container-inner" v-if="flag.variants.length">
                   <div v-for="variant in flag.variants" :key="variant.id">
-                    <el-card shadow="hover">
+                    <el-card shadow="never">
                       <el-form label-position="left" label-width="100px">
                         <div class="flex-row id-row">
                           <el-tag type="primary" :disable-transitions="true">
@@ -168,7 +198,12 @@
                   </div>
                 </div>
                 <div class="segments-container-inner" v-if="flag.segments.length">
-                  <el-card shadow="hover" v-for="segment in flag.segments" :key="segment.id" class="segment">
+                  <el-card
+                    shadow="never"
+                    v-for="segment in flag.segments"
+                    :key="segment.id"
+                    class="segment"
+                  >
                     <div class="flex-row id-row">
                       <div class="flex-row-left">
                         <el-button size="small" @click="segmentUp(segment, flag.segments)">
@@ -311,35 +346,61 @@
               <spinner v-if="!loaded"></spinner>
             </el-tab-pane>
             <el-tab-pane label="Settings">
-              <div>
-                <el-row class="settings-body">
-                  <el-col>
-                    <div>
-                      <el-switch size="small" v-model="flag.dataRecordsEnabled" active-color="#74E5E0"
-                        :active-value="true" :inactive-value="false"></el-switch>
-                      <span style="margin-left: 10px;">Enable logging to data pipeline, e.g. Kafka, Kinesis,
-                        PubSub.</span>
-                    </div>
-                  </el-col>
-                </el-row>
-                <el-row class="settings-body">
-                  <el-col style="margin-left: 50px;">
-                    <span v-show="!!flag.dataRecordsEnabled">Specify the override of the entityType in data records
-                      logging: </span>
-                    <el-select v-show="!!flag.dataRecordsEnabled" v-model="flag.entityType" size="mini" filterable
-                      :allow-create="allowCreateEntityType" default-first-option placeholder="<null>">
-                      <el-option v-for="item in entityTypes" :key="item.value" :label="item.label"
-                        :value="item.value"></el-option>
-                    </el-select>
-                  </el-col>
-                </el-row>
-                <el-row class="settings-body">
-                  <el-button @click="dialogDeleteFlagVisible = true" type="danger" plain>
-                    <span class="el-icon-delete"></span>
-                    Delete Flag
-                  </el-button>
-                </el-row>
-              </div>
+              <el-card class="flag-config-card base-card">
+                <div class="tools-debugging-h3">
+                  <span>Logging</span>
+                </div>
+                <el-divider></el-divider>
+                <div>
+                  <el-row class="settings-body">
+                      <el-col>
+                        <div>
+                          <el-switch
+                            size="small"
+                            v-model="flag.dataRecordsEnabled"
+                            active-color="#74E5E0"
+                            :active-value="true"
+                            :inactive-value="false"
+                          ></el-switch>
+                          <span style="margin-left: 10px;">Enable logging to data pipeline, e.g. Kafka, Kinesis, PubSub.</span>
+                        </div>
+                      </el-col>
+                  </el-row>
+                  <el-row class="settings-body">
+                    <el-col style="margin-left: 50px;">
+                      <span v-show="!!flag.dataRecordsEnabled" >Specify the override of the entityType in data records logging: </span>
+                      <el-select
+                          v-show="!!flag.dataRecordsEnabled"
+                          v-model="flag.entityType"
+                          size="mini"
+                          filterable
+                          :allow-create="allowCreateEntityType"
+                          default-first-option
+                          placeholder="<null>"
+                        >
+                          <el-option
+                            v-for="item in entityTypes"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          ></el-option>
+                      </el-select>
+                    </el-col>
+                  </el-row>
+                </div>
+                <div class="tools-debugging-h3">
+                  <span>Deleting flag</span>
+                </div>
+                <el-divider></el-divider>
+                <div>
+                  <el-row class="settings-body">
+                    <el-button @click="dialogDeleteFlagVisible = true" type="danger" plain>
+                      <span class="el-icon-delete"></span>
+                      Delete Flag
+                    </el-button>
+                  </el-row>
+                </div>
+              </el-card>
             </el-tab-pane>
             <el-tab-pane label="Tools">
               <debug-console :flag="this.flag"></debug-console>
@@ -1031,5 +1092,9 @@ ol.constraints-inner {
 
 .button-new-tag {
   margin: 2.5px;
+}
+
+.el-tabs__item {
+  font-size: 18px;
 }
 </style>

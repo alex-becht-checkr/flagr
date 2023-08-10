@@ -1,93 +1,52 @@
 <template>
-  <el-card class="dc-container">
-    <div slot="header" class="el-card-header">
-      <h2>Debug Console</h2>
+  <el-card class="flag-config-card base-card" >
+    <div>
+      <el-row>
+        <el-col :span="12">
+          <div class="tools-debugging-h3">
+            <span>Debugging tool</span>
+          </div>
+        </el-col>
+        <el-col :span="12">
+          <div align="right">
+            <el-button type="text" @click="toggleDebugModes" class="tools-debugging-link-button">
+              Switch to
+              {{ !this.showSimpleDebug ? "Simple" : "Advanced" }}
+              Debugging
+            </el-button>
+          </div>
+        </el-col>
+      </el-row>
+      <el-divider></el-divider>
+    </div>  
+    <div v-if="showSimpleDebug">
+      <simple-debug-console :flag="this.flag"
+                            :eval-context="this.evalContext"
+                            :eval-result="this.evalResult"
+                            @post-evaluation="postEvaluation(evalContext)"
+      ></simple-debug-console>
     </div>
-    <el-collapse>
-      <el-collapse-item title="Evaluation">
-        <el-row :gutter="10">
-          <el-col :span="5">
-            <span>Request</span>
-          </el-col>
-          <el-col :span="7" class="evaluation-button-col">
-            <el-button
-              size="mini"
-              @click="postEvaluation(evalContext)"
-              type="primary"
-              plain
-            >POST /api/v1/evaluation</el-button>
-          </el-col>
-          <el-col :span="6">
-            <span>Response</span>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="12">
-            <vue-json-editor
-              v-model="evalContext"
-              :showBtns="false"
-              ref="evalContextEditor"
-              class="json-editor"
-            ></vue-json-editor>
-          </el-col>
-          <el-col :span="12">
-            <vue-json-editor
-              v-model="evalResult"
-              :showBtns="false"
-              ref="evalResultEditor"
-              class="json-editor"
-            ></vue-json-editor>
-          </el-col>
-        </el-row>
-      </el-collapse-item>
-
-      <el-collapse-item title="Batch Evaluation">
-        <el-row :gutter="10">
-          <el-col :span="5">
-            <span>Request</span>
-          </el-col>
-          <el-col :span="7" class="evaluation-button-col">
-            <el-button
-              size="mini"
-              @click="postEvaluationBatch(batchEvalContext)"
-              type="primary"
-              plain
-            >POST /api/v1/evaluation/batch</el-button>
-          </el-col>
-          <el-col :span="6">
-            <span>Response</span>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="12">
-            <vue-json-editor
-              v-model="batchEvalContext"
-              :showBtns="false"
-              ref="batchEvalContextEditor"
-              class="json-editor"
-            ></vue-json-editor>
-          </el-col>
-          <el-col :span="12">
-            <vue-json-editor
-              v-model="batchEvalResult"
-              :showBtns="false"
-              ref="batchEvalResultEditor"
-              class="json-editor"
-            ></vue-json-editor>
-          </el-col>
-        </el-row>
-      </el-collapse-item>
-    </el-collapse>
+    <div v-else>
+      <advanced-debug-console :flag="this.flag"
+                              :eval-context="this.evalContext"
+                              :eval-result="this.evalResult"
+                              :batch-eval-context="this.batchEvalContext"
+                              :batch-eval-result="this.batchEvalResult"
+                              @post-evaluation="postEvaluation(evalContext)"
+                              @post-evaluation-batch="postEvaluationBatch(batchEvalContext)"
+      ></advanced-debug-console>
+    </div>
   </el-card>
 </template>
 
 <script>
+import SimpleDebugConsole from "@/components/SimpleDebugConsole";
+import AdvancedDebugConsole from "@/components/AdvancedDebugConsole.vue";
 import Axios from "axios";
-import vueJsonEditor from "vue-json-editor";
 
 import constants from "@/constants";
 
-const { API_URL } = constants;
+const {API_URL} = constants;
 
 export default {
   name: "debug-console",
@@ -125,53 +84,93 @@ export default {
         enableDebug: true,
         flagIDs: [this.flag.id]
       },
-      batchEvalResult: {}
+      batchEvalResult: {},
+      showSimpleDebug: true
     };
   },
   methods: {
     postEvaluation(evalContext) {
       Axios.post(`${API_URL}/evaluation`, evalContext).then(
-        response => {
-          this.$message.success(`evaluation success`);
-          this.evalResult = response.data;
-        },
-        () => {
-          this.$message.error(`evaluation error`);
-        }
+          response => {
+            this.$message.success(`evaluation success`);
+            this.evalResult = response.data;
+          },
+          () => {
+            this.$message.error(`evaluation error`);
+          }
       );
     },
     postEvaluationBatch(batchEvalContext) {
       Axios.post(`${API_URL}/evaluation/batch`, batchEvalContext).then(
-        response => {
-          this.$message.success(`evaluation success`);
-          this.batchEvalResult = response.data;
-        },
-        () => {
-          this.$message.error(`evaluation error`);
-        }
+          response => {
+            this.$message.success(`evaluation success`);
+            this.batchEvalResult = response.data;
+          },
+          () => {
+            this.$message.error(`evaluation error`);
+          }
       );
+    },
+    toggleDebugModes() {
+      this.showSimpleDebug = !this.showSimpleDebug;
     }
   },
   components: {
-    vueJsonEditor
-  },
-  mounted() {
-    this.$refs.evalContextEditor.editor.setMode("code");
-    this.$refs.evalResultEditor.editor.setMode("code");
-    this.$refs.batchEvalContextEditor.editor.setMode("code");
-    this.$refs.batchEvalResultEditor.editor.setMode("code");
+    simpleDebugConsole: SimpleDebugConsole,
+    advancedDebugConsole: AdvancedDebugConsole
   }
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .json-editor {
   margin-top: 3px;
+
   .jsoneditor {
     height: 400px;
   }
 }
-.evaluation-button-col {
-  text-align: right;
+
+.tools-debugging-h2 {
+  font-size: 24px;
 }
+
+.tools-debugging-h3 {
+  font-size: 18px;
+}
+
+.tools-debugging-h4 {
+  font-size: 15px;
+}
+
+.tools-debugging-subheader {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight:bold;
+}
+
+.tools-debugging-top-description {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.tools-debugging-space {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.tools-debugging-body {
+  font-size: 13px;
+}
+
+.el-divider--horizontal { 
+  margin-top: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.tools-debugging-link-button {
+  padding: 0;
+  font-size: 13px;
+}
+
 </style>
