@@ -6,6 +6,38 @@
           Save flag
         </el-button>
 
+        <el-dialog title="Delete variant" :visible.sync="dialogDeleteVariantVisible">
+          <span>{{`Are you sure you want to delete variant #${variantToDelete.id} [${variantToDelete.key}]`}}</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="cancelVariantDeletion">Cancel</el-button>
+            <el-button type="primary" @click="confirmVariantDeletion">Confirm</el-button>
+          </span>
+        </el-dialog>
+
+        <el-dialog title="Delete tag" :visible.sync="dialogDeleteTagVisible">
+          <span>{{`Are you sure you want to delete tag #${tagToDelete.value}`}}</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="cancelTagDeletion">Cancel</el-button>
+            <el-button type="primary" @click="confirmTagDeletion">Confirm</el-button>
+          </span>
+        </el-dialog>
+
+        <el-dialog title="Delete constraint" :visible.sync="dialogDeleteConstraintVisible">
+          <span>Are you sure you want to delete this constraint?</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="cancelConstraintDeletion">Cancel</el-button>
+            <el-button type="primary" @click="confirmConstraintDeletion">Confirm</el-button>
+          </span>
+        </el-dialog>
+
+        <el-dialog title="Delete segment" :visible.sync="dialogDeleteSegmentVisible">
+          <span>Are you sure you want to delete this segment?</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="cancelSegmentDeletion">Cancel</el-button>
+            <el-button type="primary" @click="confirmSegmentDeletion">Confirm</el-button>
+          </span>
+        </el-dialog>
+
         <el-dialog title="Delete feature flag" :visible.sync="dialogDeleteFlagVisible">
           <span>Are you sure you want to delete this feature flag?</span>
           <span slot="footer" class="dialog-footer">
@@ -13,6 +45,7 @@
             <el-button type="primary" @click.prevent="deleteFlag">Confirm</el-button>
           </span>
         </el-dialog>
+
         <el-dialog title="Create segment" :visible.sync="dialogCreateSegmentOpen">
           <div>
             <p>
@@ -509,6 +542,14 @@ export default {
       loaded: false,
       dialogDeleteFlagVisible: false,
       dialogCreateSegmentOpen: false,
+      dialogDeleteVariantVisible: false,
+      dialogDeleteSegmentVisible: false,
+      dialogDeleteTagVisible: false,
+      dialogDeleteConstraintVisible: false,
+      variantToDelete: {},
+      segmentToDelete: {},
+      tagToDelete: {},
+      constraintToDelete: {},
       entityTypes: [],
       allTags: [],
       allowCreateEntityType: true,
@@ -534,7 +575,7 @@ export default {
       operatorOptions: operators,
       operatorValueToLabelMap: OPERATOR_VALUE_TO_LABEL_MAP,
       showMdEditor: false,
-      historyReload: true,
+      historyReload: true
     };
   },
   computed: {
@@ -646,29 +687,30 @@ export default {
     },
     deleteVariant(variant) {
       const isVariantInUse = this.flag.segments.some(segment =>
-        segment.distributions.some(
-          distribution => distribution.variantID === variant.id
-        )
+          segment.distributions.some(
+              distribution => distribution.variantID === variant.id
+          )
       );
 
       if (isVariantInUse) {
-        alert(
-          "This variant is being used by a segment distribution. Please remove the segment or edit the distribution in order to remove this variant."
-        );
+        this.$message.error("This variant is being used by a segment distribution. Please remove the segment or edit the distribution in order to remove this variant.");
+
         return;
       }
 
-      if (
-        !confirm(
-          `Are you sure you want to delete variant #${variant.id} [${variant.key}]`
-        )
-      ) {
-        return;
-      }
-
+      this.dialogDeleteVariantVisible = true;
+      this.variantToDelete = variant;
+    },
+    cancelVariantDeletion() {
+      this.dialogDeleteVariantVisible = false;
+      this.variantToDelete = {};
+    },
+    confirmVariantDeletion() {
       Axios.delete(
-        `${API_URL}/flags/${this.flagId}/variants/${variant.id}`
+          `${API_URL}/flags/${this.flagId}/variants/${this.variantToDelete.id}`
       ).then(() => {
+        this.variantToDelete = {};
+        this.dialogDeleteVariantVisible = false;
         this.$message.success("variant deleted");
         this.fetchFlag();
       }, handleErr.bind(this));
@@ -711,17 +753,23 @@ export default {
       });
     },
     deleteTag(tag) {
-      if (!confirm(`Are you sure you want to delete tag #${tag.value}`)) {
-        return;
-      }
-
-      Axios.delete(`${API_URL}/flags/${this.flagId}/tags/${tag.id}`).then(
-        () => {
-          this.$message.success("tag deleted");
-          this.fetchFlag();
-          this.loadAllTags();
-        },
-        handleErr.bind(this)
+      this.dialogDeleteTagVisible = true;
+      this.tagToDelete = tag;
+    },
+    cancelTagDeletion() {
+      this.dialogDeleteTagVisible = false;
+      this.tagToDelete = {};
+    },
+    confirmTagDeletion() {
+      Axios.delete(`${API_URL}/flags/${this.flagId}/tags/${this.tagToDelete.id}`).then(
+          () => {
+            this.$message.success("tag deleted");
+            this.dialogDeleteTagVisible = false;
+            this.tagToDelete = {};
+            this.fetchFlag();
+            this.loadAllTags();
+          },
+          handleErr.bind(this)
       );
     },
     createConstraint(segment) {
@@ -741,17 +789,26 @@ export default {
       ).catch(handleErr.bind(this));
     },
     deleteConstraint(segment, constraint) {
-      if (!confirm("Are you sure you want to delete this constraint?")) {
-        return;
-      }
-
+      this.dialogDeleteConstraintVisible = true;
+      this.constraintToDelete = constraint;
+      this.segmentToDelete = segment;
+    },
+    cancelConstraintDeletion() {
+      this.dialogDeleteConstraintVisible = false;
+      this.constraintToDelete = {};
+      this.segmentToDelete = {};
+    },
+    confirmConstraintDeletion() {
       Axios.delete(
-        `${API_URL}/flags/${this.flagId}/segments/${segment.id}/constraints/${constraint.id}`
+          `${API_URL}/flags/${this.flagId}/segments/${this.segmentToDelete.id}/constraints/${this.constraintToDelete.id}`
       ).then(() => {
-        const index = segment.constraints.findIndex(
-          c => c.id === constraint.id
+        const index = this.segmentToDelete.constraints.findIndex(
+            c => c.id === this.constraintToDelete.id
         );
-        segment.constraints.splice(index, 1);
+        this.segmentToDelete.constraints.splice(index, 1);
+        this.dialogDeleteConstraintVisible = false;
+        this.constraintToDelete = {};
+        this.segmentToDelete = {}
         this.$message.success("constraint deleted");
       }, handleErr.bind(this));
     },
@@ -796,15 +853,21 @@ export default {
       segments.splice(segmentIndex + 1, 0, segments.splice(segmentIndex, 1)[0]);
     },
     deleteSegment(segment) {
-      if (!confirm("Are you sure you want to delete this segment?")) {
-        return;
-      }
-
+      this.dialogDeleteSegmentVisible = true;
+      this.segmentToDelete = segment;
+    },
+    cancelSegmentDeletion() {
+      this.dialogDeleteSegmentVisible = false;
+      this.segmentToDelete = {};
+    },
+    confirmSegmentDeletion() {
       Axios.delete(
-        `${API_URL}/flags/${this.flagId}/segments/${segment.id}`
+          `${API_URL}/flags/${this.flagId}/segments/${this.segmentToDelete.id}`
       ).then(() => {
-        const index = this.flag.segments.findIndex(el => el.id === segment.id);
+        const index = this.flag.segments.findIndex(el => el.id === this.segmentToDelete.id);
         this.flag.segments.splice(index, 1);
+        this.dialogDeleteSegmentVisible = false;
+        this.segmentToDelete = {};
         this.$message.success("segment deleted");
       }, handleErr.bind(this));
     },
