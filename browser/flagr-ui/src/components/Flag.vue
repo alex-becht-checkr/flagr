@@ -406,7 +406,7 @@
               <debug-console :flag="this.flag"></debug-console>
             </el-tab-pane>
             <el-tab-pane label="History">
-              <flag-history :flag-id="parseInt($route.params.flagId, 10)"></flag-history>
+              <flag-history :key="historyReload" :flag-id="parseInt($route.params.flagId, 10)"></flag-history>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -511,7 +511,8 @@ export default {
       newDistributions: {},
       operatorOptions: operators,
       operatorValueToLabelMap: OPERATOR_VALUE_TO_LABEL_MAP,
-      showMdEditor: false
+      showMdEditor: false,
+      historyReload: true,
     };
   },
   computed: {
@@ -560,6 +561,7 @@ export default {
         .then(() => {
           this.loadFlagData();
           this.$message.success(`Flag updated`);
+          this.historyReload = !this.historyReload;
         }, handleErr.bind(this));
     },
     putFlag(flag) {
