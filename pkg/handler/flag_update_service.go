@@ -4,7 +4,6 @@ import (
 	"github.com/openflagr/flagr/pkg/entity"
 	"github.com/openflagr/flagr/pkg/util"
 	"github.com/openflagr/flagr/swagger_gen/models"
-	"github.com/openflagr/flagr/swagger_gen/restapi/operations/distribution"
 	"github.com/openflagr/flagr/swagger_gen/restapi/operations/flag"
 	"gorm.io/gorm"
 )
@@ -43,8 +42,8 @@ func UpdateSegments(segments []*models.Segment, flagID int64) error {
 		return nil
 	}
 
-	for _, segment := range segments {
-		if err := UpdateSegment(segment); err != nil {
+	for i, segment := range segments {
+		if err := UpdateSegment(segment, i); err != nil {
 			return err
 		}
 
@@ -59,7 +58,7 @@ func UpdateSegments(segments []*models.Segment, flagID int64) error {
 	return nil
 }
 
-func UpdateSegment(segment *models.Segment) error {
+func UpdateSegment(segment *models.Segment, rank int) error {
 	s := &entity.Segment{}
 	err := entity.
 		PreloadConstraintsDistribution(getDB()).
@@ -71,7 +70,7 @@ func UpdateSegment(segment *models.Segment) error {
 
 	s.RolloutPercent = util.SafeUint(segment.RolloutPercent)
 	s.Description = util.SafeString(segment.Description)
-	s.Rank = uint(*segment.Rank)
+	s.Rank = uint(rank)
 
 	if err := getDB().Save(s).Error; err != nil {
 		return err
@@ -119,11 +118,12 @@ func UpdateDistributions(distributions []*models.Distribution, segmentID int64, 
 		return nil
 	}
 
-	putDistributionsRequest := &models.PutDistributionsRequest{Distributions: distributions}
-	distributionParams := distribution.PutDistributionsParams{Body: putDistributionsRequest, FlagID: int64(flagID), SegmentID: int64(segmentID)}
-	if err := validatePutDistributions(distributionParams); err != nil {
-		return err
-	}
+	// putDistributionsRequest := &models.PutDistributionsRequest{Distributions: distributions}
+	// distributionParams := distribution.PutDistributionsParams{Body: putDistributionsRequest, FlagID: int64(flagID), SegmentID: int64(segmentID)}
+
+	// if err := validatePutDistributions(distributionParams); err != nil {
+	// 	return err
+	// }
 
 	tx := getDB().Begin()
 	err := tx.Where("segment_id = ?", segmentID).Delete(&entity.Distribution{}).Error
