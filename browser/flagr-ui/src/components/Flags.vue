@@ -127,20 +127,20 @@
                icon="el-icon-plus"
                round
                @click="showFlagCreator = true">
-                Create Flag
+                Create flag
     </el-button>
-    <el-dialog title="Create New Flag" :visible.sync="showFlagCreator">
+    <el-dialog title="Create new flag" :visible.sync="showFlagCreator">
       <el-form>
-        <el-form-item label="Flag Description">
+        <el-form-item label="Flag description">
           <el-input v-model="newFlag.description" placeholder="Required"></el-input>
         </el-form-item>
-        <el-form-item label="Flag Key">
+        <el-form-item label="Flag key">
           <el-input v-model="newFlag.key" placeholder="Optional"></el-input>
         </el-form-item>
         <el-form-item label="Template">
           <el-select placeholder="Select a template" v-model="selectedTemplate">
-            <el-option label="Empty Flag" value="empty"></el-option>
-            <el-option label="Simple Boolean" value="simple_boolean_flag"></el-option>
+            <el-option label="Empty flag" value="empty"></el-option>
+            <el-option label="Simple boolean" value="simple_boolean_flag"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
