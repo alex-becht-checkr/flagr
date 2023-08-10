@@ -10,18 +10,15 @@
             </div>
           </el-col>
           <el-col :span="12">
-            <div style="display: flex; justify-content: flex-end; text-align: center"> 
+            <div style="display: flex; justify-content: flex-end; text-align: center">
               <span style="font-size:13px; margin-right: 8px;">Compact View</span>
-              <el-tooltip content="Enable/Disable Flag" placement="top" effect="light">
                 <el-switch
                   v-model="compactView"
                   active-color="#13ce66"
                   inactive-color="#ff4949"
-                  @change="setFlagEnabled"
                   :active-value="true"
                   :inactive-value="false"
                 ></el-switch>
-              </el-tooltip>
             </div>
           </el-col>
         </el-row>

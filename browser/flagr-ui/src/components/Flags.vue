@@ -109,7 +109,7 @@
               </el-table-column>
               <el-table-column prop="action" label="Action" align="center" fixed="right" width="100" v-if="onlyDeleted || includeDeleted">
                 <template slot-scope="scope">
-                  <el-button @click="restoreFlag(scope.row)" type="warning" size="small"
+                  <el-button @click="restoreFlag(scope.row)" size="small" type="warning"
                     v-if="scope.row.isDeleted">Restore</el-button>
                 </template>
               </el-table-column>
@@ -368,32 +368,37 @@ export default {
     },
     updateHistory() {
       history.pushState({
+        enabled: this.enabled,
         searchTermDescription: this.searchTermDescription,
         searchTermTag: this.searchTermTag,
         searchTermKey: this.searchTermKey,
         includeDeleted: this.includeDeleted,
+        onlyDeleted: this.onlyDeleted,
         currentPage: this.currentPage,
         pageSize: this.pageSize
       }, '', '#/home');
     },
     setSearchData() {
       if (history.state) {
+        this.enabled = history.state.enabled || null,
         this.searchTermTag = history.state.searchTermTag,
-        this.searchTermDescription = history.state.searchTermDescription
+        this.searchTermDescription = history.state.searchTermDescription,
         this.searchTermKey = history.state.searchTermKey,
         this.includeDeleted = history.state.includeDeleted,
+        this.onlyDeleted = history.state.onlyDeleted,
         this.currentPage = history.state.currentPage || 1,
         this.pageSize = history.state.pageSize || 10
       }
     },
     clearSearchTerm() {
+      this.enabled = null;
       this.searchTerm = "";
       this.searchTermDescription = "";
       this.searchTermTag = "";
       this.searchTermKey = "";
       this.includeDeleted = false;
+      this.onlyDeleted = false;
       this.currentPage = 1;
-      this.pageSize = 10;
       this.updateHistory();
     },
 
@@ -403,13 +408,14 @@ export default {
         this.onlyDeleted = false
       }
       if (e == 2){
-        this.onlyDeleted = true
         this.includeDeleted = false
+        this.onlyDeleted = true
       }
       if (e == 3){
         this.includeDeleted = true
         this.onlyDeleted = false
       }
+      this.updateHistory();
     },
     onStatusFilterChange(e) {
       if (e == 1){
@@ -421,6 +427,7 @@ export default {
       if (e == 3){
         this.enabled = null
       }
+      this.updateHistory();
     }
   }
 };
