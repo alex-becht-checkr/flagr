@@ -68,7 +68,7 @@
                     style="justify-content: center;">{{ scope.row.id }}</component>
                 </template>
               </el-table-column>
-              <el-table-column prop="key" label="Key" min-width="300">
+              <el-table-column prop="key" label="Key" min-width="200">
                 <template slot-scope="scope">
                   <component :is="scope.row.isDeleted?'span':'a'" :href=getFlagUri(scope.row)>{{ scope.row.key }}
                   </component>
@@ -107,7 +107,7 @@
                     "off" }}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="action" label="Action" align="center" fixed="right" width="100">
+              <el-table-column prop="action" label="Action" align="center" fixed="right" width="100" v-if="onlyDeleted || includeDeleted">
                 <template slot-scope="scope">
                   <el-button @click="restoreFlag(scope.row)" type="warning" size="small"
                     v-if="scope.row.isDeleted">Restore</el-button>
@@ -333,6 +333,8 @@ export default {
         {
           params: {
             include_deleted: this.includeDeleted,
+            enabled: this.enabled,
+            deleted: this.onlyDeleted,
             description_like: this.searchTermDescription,
             tags: this.searchTermTag,
             key: this.searchTermKey
@@ -402,7 +404,7 @@ export default {
       }
       if (e == 2){
         this.onlyDeleted = true
-        this.includeDeleted = true
+        this.includeDeleted = false
       }
       if (e == 3){
         this.includeDeleted = true
