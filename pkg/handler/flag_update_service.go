@@ -39,6 +39,10 @@ func UpdateFlag(params flag.PutFlagParams, flagRecord *entity.Flag, tx *gorm.DB)
 }
 
 func UpdateSegments(segments []*models.Segment, flagID int64) error {
+	if len(segments) == 0 || segments == nil {
+		return nil
+	}
+
 	for _, segment := range segments {
 		if err := UpdateSegment(segment); err != nil {
 			return err
@@ -77,6 +81,10 @@ func UpdateSegment(segment *models.Segment) error {
 }
 
 func UpdateContraints(constraints []*models.Constraint) error {
+	if len(constraints) == 0 || constraints == nil {
+		return nil
+	}
+
 	for _, constraint := range constraints {
 		if err := UpdateConstraint(constraint); err != nil {
 			return err
@@ -107,6 +115,10 @@ func UpdateConstraint(constraint *models.Constraint) error {
 }
 
 func UpdateDistributions(distributions []*models.Distribution, segmentID int64, flagID int64) error {
+	if len(distributions) == 0 || distributions == nil {
+		return nil
+	}
+
 	putDistributionsRequest := &models.PutDistributionsRequest{Distributions: distributions}
 	distributionParams := distribution.PutDistributionsParams{Body: putDistributionsRequest, FlagID: int64(flagID), SegmentID: int64(segmentID)}
 	if err := validatePutDistributions(distributionParams); err != nil {
@@ -137,6 +149,10 @@ func UpdateDistributions(distributions []*models.Distribution, segmentID int64, 
 }
 
 func UpdateVariants(variants []*models.Variant, flagID int64) error {
+	if len(variants) == 0 || variants == nil {
+		return nil
+	}
+
 	for _, variant := range variants {
 		if err := UpdateVariant(variant, flagID); err != nil {
 			return err

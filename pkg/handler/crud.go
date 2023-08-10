@@ -271,7 +271,7 @@ func (c *crud) CountFlags(params flag.CountFlagsParams) middleware.Responder {
 	} else {
 		tx.Model(&q).Count(&count)
 	}
-	
+
 	return flag.NewCountFlagsOK().WithPayload(&models.Count{TotalFlags: &count})
 }
 
@@ -314,8 +314,14 @@ func (c *crud) PutFullFlag(params flag.PutFullFlagParams) middleware.Responder {
 		return flag.NewPutFullFlagDefault(404).WithPayload(ErrorMessage("%s", err))
 	}
 
-	putFlagRequest := models.PutFlagRequest{params.Body.DataRecordsEnabled, params.Body.Description, params.Body.Enabled, &params.Body.EntityType, &params.Body.Key, &params.Body.Notes}
-	flagParams := flag.PutFlagParams{params.HTTPRequest, &putFlagRequest, params.FlagID}
+	putFlagRequest := models.PutFlagRequest{
+		DataRecordsEnabled: params.Body.DataRecordsEnabled,
+		Description:        params.Body.Description,
+		Enabled:            params.Body.Enabled,
+		EntityType:         &params.Body.EntityType,
+		Key:                &params.Body.Key,
+		Notes:              &params.Body.Notes}
+	flagParams := flag.PutFlagParams{HTTPRequest: params.HTTPRequest, Body: &putFlagRequest, FlagID: params.FlagID}
 
 	if err := UpdateFlag(flagParams, f, tx); err != nil {
 		return flag.NewPutFullFlagDefault(400).WithPayload(ErrorMessage("%s", err))

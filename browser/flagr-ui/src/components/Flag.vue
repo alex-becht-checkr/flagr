@@ -31,116 +31,116 @@
         </el-breadcrumb>
 
         <el-card class="flag-config-card">
-                <div slot="header" class="el-card-header">
-                  <div class="flex-row">
-                    <div class="flex-row-left">
-                      <h2>Flag</h2>
-                    </div>
-                    <div class="flex-row-right">
-                      Enabled
-                      <el-tooltip content="Enable/Disable Flag" placement="top" effect="light">
-                        <el-switch
-                          v-model="flag.enabled"
-                          active-color="#13ce66"
-                          inactive-color="#ff4949"
-                          @change="setFlagEnabled"
-                          :active-value="true"
-                          :inactive-value="false"
-                        ></el-switch>
-                      </el-tooltip>
-                    </div>
-                  </div>
-                </div>
-                <el-card shadow="hover" :class="toggleInnerConfigCard">
-                  <div class="flex-row id-row">
-                    <div class="flex-row-left">
-                      <el-tag
-                        type="primary"
-                        :disable-transitions="true"
-                      >Flag ID: {{ $route.params.flagId }}</el-tag>
-                    </div>
-                    <div class="flex-row-right">
-                      <el-button size="small" @click="putFlag(flag)">Save Flag</el-button>
-                    </div>
-                  </div>
-                  <el-row class="flag-content" type="flex" align="middle">
-                    <el-col :span="17">
-                      <el-row>
-                        <el-col :span="24">
-                          <el-input size="small" placeholder="Key" v-model="flag.key">
-                            <template slot="prepend">Flag Key</template>
-                          </el-input>
-                        </el-col>
-                      </el-row>
-                    </el-col>
-                  </el-row>
-                  <el-row class="flag-content" type="flex" align="middle">
-                    <el-col :span="17">
-                      <el-row>
-                        <el-col :span="24">
-                          <el-input
-                            size="small"
-                            placeholder="Description"
-                            v-model="flag.description"
-                          >
-                            <template slot="prepend">Flag Description</template>
-                          </el-input>
-                        </el-col>
-                      </el-row>
-                    </el-col>
-                  </el-row>
-                  <el-row style="margin: 10px;">
-                    <h5>
-                      <span style="margin-right: 10px;">Flag Notes</span>
-                      <el-button round size="mini" @click="toggleShowMdEditor">
-                        <span :class="editViewIcon"></span>
-                        {{ !this.showMdEditor ? "edit" : "view" }}
-                      </el-button>
-                    </h5>
-                  </el-row>
-                  <el-row>
-                    <markdown-editor
-                      :showEditor="this.showMdEditor"
-                      :markdown.sync="flag.notes"
-                      @save="putFlag(flag)"
-                    ></markdown-editor>
-                  </el-row>
-                  <el-row style="margin: 10px;">
-                    <h5>
-                      <span style="margin-right: 10px;">Tags</span>
-                    </h5>
-                  </el-row>
-                  <el-row>
-                    <div class="tags-container-inner">
-                      <el-tag
-                        v-for="tag in flag.tags"
-                        :key="tag.id"
-                        closable
-                        :type="warning"
-                        @close="deleteTag(tag)"
-                      >{{tag.value}}</el-tag>
-                      <el-autocomplete
-                        class="tag-key-input"
-                        v-if="tagInputVisible"
-                        v-model="newTag.value"
-                        ref="saveTagInput"
-                        size="mini"
-                        :trigger-on-focus="false"
-                        :fetch-suggestions="queryTags"
-                        @select="createTag"
-                        @keyup.enter.native="createTag"
-                        @keyup.esc.native="cancelCreateTag"
-                      ></el-autocomplete>
-                      <el-button
-                        v-else
-                        class="button-new-tag"
-                        size="small"
-                        @click="showTagInput"
-                      >+ New Tag</el-button>
-                    </div>
-                  </el-row>
-                </el-card>
-              </el-card>
+          <div slot="header" class="el-card-header">
+            <div class="flex-row">
+              <div class="flex-row-left">
+                <h2>Flag</h2>
+              </div>
+              <div class="flex-row-right">
+                Enabled
+                <el-tooltip content="Enable/Disable Flag" placement="top" effect="light">
+                  <el-switch
+                    v-model="flag.enabled"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    @change="setFlagEnabled"
+                    :active-value="true"
+                    :inactive-value="false"
+                  ></el-switch>
+                </el-tooltip>
+              </div>
+            </div>
+          </div>
+          <el-card shadow="hover" :class="toggleInnerConfigCard">
+            <div class="flex-row id-row">
+              <div class="flex-row-left">
+                <el-tag
+                  type="primary"
+                  :disable-transitions="true"
+                >Flag ID: {{ $route.params.flagId }}</el-tag>
+              </div>
+              <div class="flex-row-right">
+                <el-button size="small" @click="saveFlag(flag)">Save Flag</el-button>
+              </div>
+            </div>
+            <el-row class="flag-content" type="flex" align="middle">
+              <el-col :span="17">
+                <el-row>
+                  <el-col :span="24">
+                    <el-input size="small" placeholder="Key" v-model="flag.key">
+                      <template slot="prepend">Flag Key</template>
+                    </el-input>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <el-row class="flag-content" type="flex" align="middle">
+              <el-col :span="17">
+                <el-row>
+                  <el-col :span="24">
+                    <el-input
+                      size="small"
+                      placeholder="Description"
+                      v-model="flag.description"
+                    >
+                      <template slot="prepend">Flag Description</template>
+                    </el-input>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <el-row style="margin: 10px;">
+              <h5>
+                <span style="margin-right: 10px;">Flag Notes</span>
+                <el-button round size="mini" @click="toggleShowMdEditor">
+                  <span :class="editViewIcon"></span>
+                  {{ !this.showMdEditor ? "edit" : "view" }}
+                </el-button>
+              </h5>
+            </el-row>
+            <el-row>
+              <markdown-editor
+                :showEditor="this.showMdEditor"
+                :markdown.sync="flag.notes"
+                @save="putFlag(flag)"
+              ></markdown-editor>
+            </el-row>
+            <el-row style="margin: 10px;">
+              <h5>
+                <span style="margin-right: 10px;">Tags</span>
+              </h5>
+            </el-row>
+            <el-row>
+              <div class="tags-container-inner">
+                <el-tag
+                  v-for="tag in flag.tags"
+                  :key="tag.id"
+                  closable
+                  :type="warning"
+                  @close="deleteTag(tag)"
+                >{{tag.value}}</el-tag>
+                <el-autocomplete
+                  class="tag-key-input"
+                  v-if="tagInputVisible"
+                  v-model="newTag.value"
+                  ref="saveTagInput"
+                  size="mini"
+                  :trigger-on-focus="false"
+                  :fetch-suggestions="queryTags"
+                  @select="createTag"
+                  @keyup.enter.native="createTag"
+                  @keyup.esc.native="cancelCreateTag"
+                ></el-autocomplete>
+                <el-button
+                  v-else
+                  class="button-new-tag"
+                  size="small"
+                  @click="showTagInput"
+                >+ New Tag</el-button>
+              </div>
+            </el-row>
+          </el-card>
+        </el-card>
 
         <div v-if="loaded && flag">
           <el-tabs>
@@ -167,11 +167,6 @@
                             <template slot="prepend">Key</template>
                           </el-input>
                           <div class="flex-row-right save-remove-variant-row">
-                            <el-button
-                              slot="append"
-                              size="small"
-                              @click="putVariant(variant)"
-                            >Save Variant</el-button>
                             <el-button @click="deleteVariant(variant)" size="small">
                               <span class="el-icon-delete" />
                             </el-button>
@@ -221,7 +216,6 @@
                       <h2>Segments</h2>
                     </div>
                     <div class="flex-row-right">
-                      <el-button @click="putSegmentsReorder(flag.segments)">Reorder</el-button>
                       <el-button @click="dialogCreateSegmentOpen = true">New Segment</el-button>
                     </div>
                   </div>
@@ -252,11 +246,6 @@
                         </el-tag>
                       </div>
                       <div class="flex-row-right">
-                        <el-button
-                          slot="append"
-                          size="small"
-                          @click="putSegment(segment)"
-                        >Save Segment Setting</el-button>
                         <el-button size="small" @click="cloneSegment(segment)">Clone Segment</el-button>
                         <el-button @click="deleteSegment(segment)" size="small">
                           <span class="el-icon-delete" />
@@ -326,15 +315,6 @@
                                   </el-input>
                                 </el-col>
                                 <el-col :span="2">
-                                  <el-button
-                                    type="success"
-                                    plain
-                                    class="width--full"
-                                    @click="
-                                      putConstraint(segment, constraint)
-                                    "
-                                    size="small"
-                                  >Save</el-button>
                                 </el-col>
                                 <el-col :span="2">
                                   <el-button
@@ -640,6 +620,16 @@ export default {
         this.$message.success(`You deleted flag ${flagId}`);
       }, handleErr.bind(this));
     },
+    saveFlag(flag){
+      for (var segment of flag.segments) {
+        segment.rolloutPercent = parseInt(segment.rolloutPercent);
+      }
+      Axios.put(`${API_URL}/flags/${this.flagId}/full`, flag)
+          .then(()=>{
+            this.loadFlagData();
+            this.$message.success(`Flag updated`);
+          }, handleErr.bind(this));
+    },
     putFlag(flag) {
       Axios.put(`${API_URL}/flags/${this.flagId}`, {
         description: flag.description,
@@ -727,18 +717,6 @@ export default {
         this.fetchFlag();
       }, handleErr.bind(this));
     },
-    putVariant(variant) {
-      if (variant.attachmentValid === false) {
-        this.$message.error("variant attachment is not valid");
-        return;
-      }
-      Axios.put(
-        `${API_URL}/flags/${this.flagId}/variants/${variant.id}`,
-        variant
-      ).then(() => {
-        this.$message.success("variant updated");
-      }, handleErr.bind(this));
-    },
     createTag() {
       Axios.post(`${API_URL}/flags/${this.flagId}/tags`, this.newTag).then(
         response => {
@@ -805,14 +783,6 @@ export default {
         constraint,
       ).catch(handleErr.bind(this));
     },
-    putConstraint(segment, constraint) {
-      Axios.put(
-        `${API_URL}/flags/${this.flagId}/segments/${segment.id}/constraints/${constraint.id}`,
-        constraint
-      ).then(() => {
-        this.$message.success("constraint updated");
-      }, handleErr.bind(this));
-    },
     deleteConstraint(segment, constraint) {
       if (!confirm("Are you sure you want to delete this constraint?")) {
         return;
@@ -826,14 +796,6 @@ export default {
         );
         segment.constraints.splice(index, 1);
         this.$message.success("constraint deleted");
-      }, handleErr.bind(this));
-    },
-    putSegment(segment) {
-      Axios.put(`${API_URL}/flags/${this.flagId}/segments/${segment.id}`, {
-        description: segment.description,
-        rolloutPercent: parseInt(segment.rolloutPercent, 10)
-      }).then(() => {
-        this.$message.success("segment updated");
       }, handleErr.bind(this));
     },
     cloneSegment(segment) {
@@ -876,13 +838,6 @@ export default {
 
       segments.splice(segmentIndex + 1, 0, segments.splice(segmentIndex, 1)[0]);
     },
-    putSegmentsReorder(segments) {
-      Axios.put(`${API_URL}/flags/${this.flagId}/segments/reorder`, {
-        segmentIDs: pluck(segments, "id")
-      }).then(() => {
-        this.$message.success("segment reordered");
-      }, handleErr.bind(this));
-    },
     deleteSegment(segment) {
       if (!confirm("Are you sure you want to delete this segment?")) {
         return;
@@ -919,6 +874,10 @@ export default {
         `${API_URL}/flags/${this.flagId}/segments/${segmentId}/distributions`,
         { distributions },
       ).catch(handleErr.bind(this));
+    },
+    loadFlagData() {
+      this.fetchFlag();
+      this.loadAllTags();
     },
     fetchFlag() {
       Axios.get(`${API_URL}/flags/${this.flagId}`).then(response => {
@@ -988,8 +947,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchFlag();
-    this.loadAllTags();
+    this.loadFlagData();
   }
 };
 </script>
