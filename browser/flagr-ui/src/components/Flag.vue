@@ -27,7 +27,7 @@
           <el-breadcrumb-item>Flag ID: {{ $route.params.flagId }}</el-breadcrumb-item>
         </el-breadcrumb>
 
-        <el-card class="flag-config-card">
+        <el-card class="flag-config-card base-card">
           <div slot="header" class="el-card-header">
             <div class="flex-row">
               <div class="flex-row-left">
@@ -107,7 +107,7 @@
         <div v-if="loaded && flag">
           <el-tabs>
             <el-tab-pane label="Configuration">
-              <el-card class="variants-container">
+              <el-card class="variants-container base-card">
                 <div slot="header" class="clearfix">
                   <h2>Variants</h2>
                 </div>
@@ -153,7 +153,7 @@
                 </div>
               </el-card>
 
-              <el-card class="segments-container">
+              <el-card class="segments-container base-card">
                 <div slot="header" class="el-card-header">
                   <div class="flex-row">
                     <div class="flex-row-left">

@@ -175,9 +175,9 @@ ol {
 
   .el-card {
     .el-card__header {
-      background-color: #74e5e0;
       color: #2e4960;
       border: 0;
+      border-bottom: 1px solid #e4e7ed;
 
       h2 {
         margin: -0.2em;
@@ -186,6 +186,20 @@ ol {
       }
     }
     margin-bottom: 1em;
+  }
+
+  .base-card {
+    border: 0px;
+
+  .el-card__body {
+    .el-card {
+      border: 1px solid #ebeef5;
+    }
+    .el-card__body {
+      border-left: 4px solid #74E5E0;
+    }
+  }
+  box-shadow: none !important;
   }
 
   .jsoneditor {
@@ -201,6 +215,10 @@ ol {
 
   .el-tag {
     margin: 2.5px;
+  }
+
+  .align-right {
+    text-align: right;
   }
 }
 </style>
