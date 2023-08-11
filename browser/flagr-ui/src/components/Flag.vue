@@ -616,9 +616,7 @@ export default {
     saveFlag(flag) {
       for (var segment of flag.segments) {
         segment.rolloutPercent = parseInt(segment.rolloutPercent);
-        if (segment.constraint && segment.constraint.operator && segment.constraint.value) {
-          segment.constraint = this.formatConstraint(segment.constraint);
-        }
+        segment.constraints = segment.constraints.map(this.formatConstraint);
       }
       Axios.put(`${API_URL}/flags/${this.flagId}/full`, flag)
         .then(() => {
@@ -670,7 +668,6 @@ export default {
       this.putDistributions(segment.id, distributions).then(response => {
         let distributions = response.data;
         segment.distributions = distributions;
-        console.log('success');
         this.$message.success("distributions updated");
       });
     },
@@ -901,6 +898,7 @@ export default {
     },
     formatConstraint(constraint) {
       if (constraint.operator === "IN" || constraint.operator === "NIN") {
+        constraint.value = constraint.value.split(",").map(this.quoteString).join(",");
         if (!constraint.value.match(/\[/)) {
           constraint.value = `[${constraint.value}`;
         }
@@ -908,14 +906,7 @@ export default {
           constraint.value = `${constraint.value}]`;
         }
       } else {
-        if (constraint.value.match(/[a-zA-z]+/)) {
-          if (!(constraint.value.match(/^"/))) {
-            constraint.value = `"${constraint.value}`;
-          }
-          if (!(constraint.value.match(/"$/))) {
-            constraint.value = `${constraint.value}"`;
-          }
-        }
+        constraint.value = this.quoteString(constraint.value);
       }
       return constraint;
     },
@@ -985,6 +976,18 @@ export default {
         segment.distributions.push(newDistribution);
       }
     },
+    quoteString(value) {
+      var sanitized = value.replace(/\[|\]/g, "");
+      if (sanitized.match(/[a-zA-z]+/)) {
+        if (!(sanitized.match(/^"/))) {
+          sanitized = `"${sanitized}`;
+        }
+        if (!(sanitized.match(/"$/))) {
+          sanitized = `${sanitized}"`;
+        }
+      }
+      return sanitized;
+    }
   },
   mounted() {
     this.loadFlagData();
