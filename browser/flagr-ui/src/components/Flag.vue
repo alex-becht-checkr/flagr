@@ -6,35 +6,11 @@
           Save flag
         </el-button>
 
-        <el-dialog title="Delete variant" :visible.sync="dialogDeleteVariantVisible">
-          <span>{{`Are you sure you want to delete variant #${variantToDelete.id} [${variantToDelete.key}]`}}</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="cancelVariantDeletion">Cancel</el-button>
-            <el-button type="primary" @click="confirmVariantDeletion">Confirm</el-button>
-          </span>
-        </el-dialog>
-
         <el-dialog title="Delete tag" :visible.sync="dialogDeleteTagVisible">
           <span>{{`Are you sure you want to delete tag #${tagToDelete.value}`}}</span>
           <span slot="footer" class="dialog-footer">
             <el-button @click="cancelTagDeletion">Cancel</el-button>
             <el-button type="primary" @click="confirmTagDeletion">Confirm</el-button>
-          </span>
-        </el-dialog>
-
-        <el-dialog title="Delete constraint" :visible.sync="dialogDeleteConstraintVisible">
-          <span>Are you sure you want to delete this constraint?</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="cancelConstraintDeletion">Cancel</el-button>
-            <el-button type="primary" @click="confirmConstraintDeletion">Confirm</el-button>
-          </span>
-        </el-dialog>
-
-        <el-dialog title="Delete segment" :visible.sync="dialogDeleteSegmentVisible">
-          <span>Are you sure you want to delete this segment?</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="cancelSegmentDeletion">Cancel</el-button>
-            <el-button type="primary" @click="confirmSegmentDeletion">Confirm</el-button>
           </span>
         </el-dialog>
 
@@ -44,19 +20,6 @@
             <el-button @click="dialogDeleteFlagVisible = false">Cancel</el-button>
             <el-button type="primary" @click.prevent="deleteFlag">Confirm</el-button>
           </span>
-        </el-dialog>
-
-        <el-dialog title="Create segment" :visible.sync="dialogCreateSegmentOpen">
-          <div>
-            <p>
-              <el-input placeholder="Segment description" v-model="newSegment.description"></el-input>
-            </p>
-            <p>
-              <el-slider v-model="newSegment.rolloutPercent" show-input></el-slider>
-            </p>
-            <el-button class="width--full" :disabled="!newSegment.description" @click.prevent="createSegment">Create
-              segment</el-button>
-          </div>
         </el-dialog>
 
         <el-breadcrumb separator="/">
@@ -170,234 +133,15 @@
         <div v-if="loaded && flag">
           <el-tabs>
             <el-tab-pane label="Configuration">
-              <el-card class="variants-container base-card">
-                <div slot="header" class="clearfix">
-                  <h2>Variants
-                      <el-tooltip placement="bottom" effect="light">
-                        <div slot="content">Potential outputs being evaluated<br>
-                          by this flag.
-                        </div>
-                        <span class="el-icon-info" style="vertical-align: middle; font-size: 1rem;"></span>
-                      </el-tooltip>
-                  </h2>
-                </div>
-                <div class="variants-container-inner" v-if="flag.variants.length">
-                  <div v-for="variant in flag.variants" :key="variant.id">
-                    <el-card shadow="never">
-                      <el-form label-position="left" label-width="100px">
-                        <div class="flex-row id-row">
-                          <el-tag type="primary" :disable-transitions="true">
-                            Variant ID:
-                            <b>{{ variant.id }}</b>
-                          </el-tag>
-                          <el-input class="variant-key-input" size="small" placeholder="Key" v-model="variant.key">
-                            <template slot="prepend">Key</template>
-                          </el-input>
-                          <div class="flex-row-right save-remove-variant-row">
-                            <el-button @click="deleteVariant(variant)" size="small">
-                              <span class="el-icon-delete" />
-                            </el-button>
-                          </div>
-                        </div>
-                        <el-collapse class="flex-row">
-                          <el-collapse-item title="Variant attachment" class="variant-attachment-collapsable-title">
-                            <p class="variant-attachment-title">You can add JSON in key/value pairs format.</p>
-                            <vue-json-editor v-model="variant.attachment" :showBtns="false" :mode="'code'"
-                              v-on:has-error="variant.attachmentValid = false" v-on:input="variant.attachmentValid = true"
-                              class="variant-attachment-content"></vue-json-editor>
-                          </el-collapse-item>
-                        </el-collapse>
-                      </el-form>
-                    </el-card>
-                  </div>
-                </div>
-                <div class="card--error" v-else>No variants created for this feature flag yet</div>
-                <div class="variants-input">
-                  <div class="flex-row equal-width constraints-inputs-container">
-                    <div>
-                      <el-input placeholder="Variant key" v-model="newVariant.key"></el-input>
-                    </div>
-                  </div>
-                  <el-button class="width--full" :disabled="!newVariant.key" @click.prevent="createVariant">Create
-                    variant</el-button>
-                </div>
-              </el-card>
+              <Variants :flag-id="flag.id"
+                        :segments="flag.segments"
+                        :variants="flag.variants"
+                        @fetch-flag="fetchFlag"/>
 
-              <el-card class="segments-container base-card">
-                <div slot="header" class="el-card-header">
-                  <div class="flex-row">
-                    <div class="flex-row">
-                      <h2>Segments
-                      <el-tooltip placement="bottom" effect="light">
-                        <div slot="content">How each variant is being evaluated.<br>
-                          A variant must match all constraints<br>
-                          within a segment or it will be passed<br>
-                          to the next segment.</div>
-                        <span class="el-icon-info" style="vertical-align: middle; font-size: 1rem;"></span>
-                      </el-tooltip>
-                    </h2>
-                    </div>
-                    <div class="flex-row-right">
-                      <el-button @click="dialogCreateSegmentOpen = true">New segment</el-button>
-                    </div>
-                  </div>
-                </div>
-                <div class="segments-container-inner" v-if="flag.segments.length">
-                  <el-card
-                    shadow="never"
-                    v-for="segment in flag.segments"
-                    :key="segment.id"
-                    class="segment"
-                  >
-                    <div class="flex-row id-row">
-                      <div class="flex-row-left">
-                        <el-button size="small" @click="segmentUp(segment, flag.segments)">
-                          <span class="el-icon-arrow-up">
-                          </span>
-                        </el-button>
-                        <el-button size="small" @click="segmentDown(segment, flag.segments)" style="margin-right: 15px">
-                          <span class="el-icon-arrow-down">
-                          </span>
-                        </el-button>
-                        <el-tag type="primary" :disable-transitions="true">
-                          Segment ID:
-                          <b>{{ segment.id }}</b>
-                        </el-tag>
-                      </div>
-                      <div class="flex-row-right">
-                        <el-button size="small" @click="cloneSegment(segment)">Clone segment</el-button>
-                        <el-button @click="deleteSegment(segment)" size="small">
-                          <span class="el-icon-delete" />
-                        </el-button>
-                      </div>
-                    </div>
-                    <el-row :gutter="10" class="id-row">
-                      <el-col :span="15">
-                        <el-input size="small" placeholder="Description" v-model="segment.description">
-                          <template slot="prepend">Description</template>
-                        </el-input>
-                      </el-col>
-                      <el-col :span="9">
-                        <el-input class="segment-rollout-percent" size="small" placeholder="0"
-                          v-model="segment.rolloutPercent" :min="0" :max="100">
-                          <template slot="prepend">Rollout</template>
-                          <template slot="append">%</template>
-                        </el-input>
-                      </el-col>
-                    </el-row>
-                    <el-row>
-                      <el-col :span="24">
-                        <h5>Constraints (match ALL of them)
-                          <el-tooltip placement="bottom" effect="light">
-                            <div slot="content">Used to validate if a particular segment<br>
-                              is eligible to be matched with a variant.</div>
-                            <span class="el-icon-info" style="vertical-align: middle;"></span>
-                          </el-tooltip>
-                        </h5>
-                        <div class="constraints">
-                          <div class="constraints-inner" v-if="segment.constraints.length">
-                            <div v-for="constraint in segment.constraints" :key="constraint.id">
-                              <el-row :gutter="3" class="segment-constraint">
-                                <el-col :span="20">
-                                  <el-input size="small" placeholder="Property" v-model="constraint.property">
-                                    <template slot="prepend">Property</template>
-                                  </el-input>
-                                </el-col>
-                                <el-col :span="4">
-                                  <el-select class="width--full" size="small" v-model="constraint.operator"
-                                    placeholder="operator">
-                                    <el-option v-for="item in operatorOptions" :key="item.value" :label="item.label"
-                                      :value="item.value"></el-option>
-                                  </el-select>
-                                </el-col>
-                                <el-col :span="20">
-                                  <el-input v-if="listConstraint(constraint)" autosize size="small" label="value"
-                                    type="textarea" v-model="constraint.value">
-                                  </el-input>
-                                  <el-input v-else size="small" v-model="constraint.value">
-                                    <template slot="prepend">Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</template>
-                                  </el-input>
-                                </el-col>
-                                <el-col :span="2">
-                                </el-col>
-                                <el-col :span="2">
-                                  <el-button type="danger" plain class="width--full" @click="
-                                    deleteConstraint(segment, constraint)
-                                    " size="small">
-                                    <i class="el-icon-delete"></i>
-                                  </el-button>
-                                </el-col>
-                              </el-row>
-                            </div>
-                          </div>
-                          <div class="card--empty" v-else>
-                            <span>No constraints (ALL will pass)</span>
-                          </div>
-                          <div>
-                            <el-row :gutter="3">
-                              <el-col :span="5">
-                                <el-input size="small" placeholder="Property"
-                                  v-model="segment.newConstraint.property"></el-input>
-                              </el-col>
-                              <el-col :span="4">
-                                <el-select size="small" v-model="segment.newConstraint.operator" placeholder="operator">
-                                  <el-option v-for="item in operatorOptions" :key="item.value" :label="item.label"
-                                    :value="item.value"></el-option>
-                                </el-select>
-                              </el-col>
-                              <el-col :span="11">
-                                <el-input v-if="listConstraint(segment.newConstraint)" type="textarea" autosize
-                                  v-model="segment.newConstraint.value"></el-input>
-                                <el-input v-else size="small" v-model="segment.newConstraint.value"></el-input>
-                              </el-col>
-                              <el-col :span="4">
-                                <el-button class="width--full" size="small" type="primary" plain :disabled="!segment.newConstraint.property ||
-                                  !segment.newConstraint.value
-                                  " @click.prevent="() => createConstraint(segment)
-    ">Add constraint</el-button>
-                              </el-col>
-                            </el-row>
-                          </div>
-                        </div>
-                      </el-col>
-                      <el-col :span="24">
-                        <h5>
-                          <span>Distribution</span>
-                          <el-tooltip placement="bottom" effect="light">
-                            <div slot="content">The possibility (in percentage) a specific<br>
-                              variant will be served to a member of that<br>
-                              segment if all its constraints are met.</div>
-                            <span class="el-icon-info" style="margin-left: 5px; vertical-align: middle;"></span>
-                          </el-tooltip>
-                        </h5>
-                      </el-col>
-                      </el-row>
-                        <el-row v-for="variant in flag.variants" :key="variant.id" :gutter="20">
-                          <el-col :span="24" class="segment-distribution">
-                            <el-input class="variant-key-input segment-distribution-variant" size="small"
-                              placeholder="rollout" type="number" :min="0" :max="100"
-                              :value="getDistributionValue(segment, variant)"
-                              @input="value => setDistributionValue(value, segment, variant)">
-                              <template slot="prepend">{{ variant.key }}</template>
-                              <template slot="append">%</template>
-                            </el-input>
-                            <el-progress color="#74E5E0"
-                              :percentage="Math.max(0, Math.min(100, getDistributionValue(segment, variant)))"></el-progress>
-                          </el-col>
-                        </el-row>
-                        <el-row v-if="sumDistributions(segment.distributions) !== 100">
-                          <el-col :span="24" class="segment-distribution-alert">
-                            <el-alert  class="edit-distribution-alert"
-                              :title="'Percentages must add up to 100% (currently at ' +
-                                sumDistributions(segment.distributions) +
-                                '%)'
-                                " type="error" :closable="false" show-icon></el-alert>
-                          </el-col>
-                        </el-row>
-                  </el-card>
-                </div>
-                <div class="card--error" v-else>No segments created for this feature flag yet</div>
-              </el-card>
+              <Segments :flag-id="flag.id"
+                        :segments="flag.segments"
+                        :variants="flag.variants"
+                        @fetch-flag="fetchFlag"/>
               <spinner v-if="!loaded"></spinner>
             </el-tab-pane>
             <el-tab-pane label="Settings">
@@ -480,46 +224,26 @@ import Spinner from "@/components/Spinner";
 import DebugConsole from "@/components/DebugConsole";
 import FlagHistory from "@/components/FlagHistory";
 import MarkdownEditor from "@/components/MarkdownEditor.vue";
-import vueJsonEditor from "vue-json-editor";
 import { operators } from "@/operators.json";
+import ConstraintService from "@/services/constraintService";
+import Segments from "@/components/Flag/Segments.vue";
+import Variants from "@/components/Flag/Variants.vue";
 
 const OPERATOR_VALUE_TO_LABEL_MAP = operators.reduce((acc, el) => {
   acc[el.value] = el.label;
   return acc;
 }, {});
 
-const { sum, pluck, handleErr } = helpers;
+const { handleErr } = helpers;
 
 const { API_URL, FLAGR_UI_POSSIBLE_ENTITY_TYPES } = constants;
-
-const DEFAULT_SEGMENT = {
-  description: "",
-  rolloutPercent: 50
-};
-
-const DEFAULT_CONSTRAINT = {
-  operator: "EQ",
-  property: "",
-  value: ""
-};
-
-const DEFAULT_VARIANT = {
-  key: ""
-};
 
 const DEFAULT_TAG = {
   value: ""
 };
 
-const DEFAULT_DISTRIBUTION = {
-  bitmap: "",
-  variantID: 0,
-  variantKey: "",
-  percent: 0
-};
-
 function processSegment(segment) {
-  segment.newConstraint = clone(DEFAULT_CONSTRAINT);
+  segment.newConstraint = clone(ConstraintService.DEFAULT_CONSTRAINT);
 }
 
 function processVariant(variant) {
@@ -531,25 +255,19 @@ function processVariant(variant) {
 export default {
   name: "flag",
   components: {
+    Variants,
+    Segments,
     spinner: Spinner,
     debugConsole: DebugConsole,
     flagHistory: FlagHistory,
-    MarkdownEditor,
-    vueJsonEditor
+    MarkdownEditor
   },
   data() {
     return {
       loaded: false,
       dialogDeleteFlagVisible: false,
-      dialogCreateSegmentOpen: false,
-      dialogDeleteVariantVisible: false,
-      dialogDeleteSegmentVisible: false,
       dialogDeleteTagVisible: false,
-      dialogDeleteConstraintVisible: false,
-      variantToDelete: {},
-      segmentToDelete: {},
       tagToDelete: {},
-      constraintToDelete: {},
       entityTypes: [],
       allTags: [],
       allowCreateEntityType: true,
@@ -568,26 +286,14 @@ export default {
         variants: [],
         notes: ""
       },
-      newSegment: clone(DEFAULT_SEGMENT),
-      newVariant: clone(DEFAULT_VARIANT),
       newTag: clone(DEFAULT_TAG),
       newDistributions: {},
-      operatorOptions: operators,
       operatorValueToLabelMap: OPERATOR_VALUE_TO_LABEL_MAP,
       showMdEditor: false,
       historyReload: true
     };
   },
   computed: {
-    newDistributionPercentageSum() {
-      return sum(pluck(Object.values(this.newDistributions), "percent"));
-    },
-    newDistributionIsValid() {
-      const percentageSum = sum(
-        pluck(Object.values(this.newDistributions), "percent")
-      );
-      return percentageSum === 100;
-    },
     flagId() {
       return this.$route.params.flagId;
     },
@@ -617,6 +323,9 @@ export default {
       for (var segment of flag.segments) {
         segment.rolloutPercent = parseInt(segment.rolloutPercent);
         segment.constraints = segment.constraints.map(this.formatConstraint);
+        segment.distributions = segment.distributions.filter(
+            distribution => distribution.percent !== 0
+        );
       }
       Axios.put(`${API_URL}/flags/${this.flagId}/full`, flag)
         .then(() => {
@@ -642,74 +351,6 @@ export default {
       }).then(() => {
         const checkedStr = checked ? "on" : "off";
         this.$message.success(`You turned ${checkedStr} this feature flag`);
-      }, handleErr.bind(this));
-    },
-    selectVariant($event, variant) {
-      const checked = $event;
-      if (checked) {
-        const distribution = Object.assign(clone(DEFAULT_DISTRIBUTION), {
-          variantKey: variant.key,
-          variantID: variant.id
-        });
-        this.$set(this.newDistributions, variant.id, distribution);
-      } else {
-        this.$delete(this.newDistributions, variant.id);
-      }
-    },
-    saveDistribution(segment) {
-      const distributions = Object.values(segment.distributions).filter(
-        distribution => distribution.percent !== 0
-      ).map(distribution => {
-        const dist = clone(distribution)
-        delete dist.id;
-        return dist
-      });
-
-      this.putDistributions(segment.id, distributions).then(response => {
-        let distributions = response.data;
-        segment.distributions = distributions;
-        this.$message.success("distributions updated");
-      });
-    },
-    createVariant() {
-      Axios.post(
-        `${API_URL}/flags/${this.flagId}/variants`,
-        this.newVariant
-      ).then(response => {
-        let variant = response.data;
-        this.newVariant = clone(DEFAULT_VARIANT);
-        this.flag.variants.push(variant);
-        this.$message.success("new variant created");
-      }, handleErr.bind(this));
-    },
-    deleteVariant(variant) {
-      const isVariantInUse = this.flag.segments.some(segment =>
-          segment.distributions.some(
-              distribution => distribution.variantID === variant.id
-          )
-      );
-
-      if (isVariantInUse) {
-        this.$message.error("This variant is being used by a segment distribution. Please remove the segment or edit the distribution in order to remove this variant.");
-
-        return;
-      }
-
-      this.dialogDeleteVariantVisible = true;
-      this.variantToDelete = variant;
-    },
-    cancelVariantDeletion() {
-      this.dialogDeleteVariantVisible = false;
-      this.variantToDelete = {};
-    },
-    confirmVariantDeletion() {
-      Axios.delete(
-          `${API_URL}/flags/${this.flagId}/variants/${this.variantToDelete.id}`
-      ).then(() => {
-        this.variantToDelete = {};
-        this.dialogDeleteVariantVisible = false;
-        this.$message.success("variant deleted");
-        this.fetchFlag();
       }, handleErr.bind(this));
     },
     createTag() {
@@ -769,146 +410,12 @@ export default {
           handleErr.bind(this)
       );
     },
-    createConstraint(segment) {
-      var formattedConstraint = this.formatConstraint(segment.newConstraint);
-      this.postConstraint(segment.id, formattedConstraint)
-        .then(response => {
-          let constraint = response.data;
-          segment.constraints.push(constraint);
-          segment.newConstraint = clone(DEFAULT_CONSTRAINT);
-          this.$message.success("new constraint created");
-        }, handleErr.bind(this));
-    },
-    postConstraint(segmentId, constraint) {
-      return Axios.post(
-        `${API_URL}/flags/${this.flagId}/segments/${segmentId}/constraints`,
-        constraint,
-      ).catch(handleErr.bind(this));
-    },
-    deleteConstraint(segment, constraint) {
-      this.dialogDeleteConstraintVisible = true;
-      this.constraintToDelete = constraint;
-      this.segmentToDelete = segment;
-    },
-    cancelConstraintDeletion() {
-      this.dialogDeleteConstraintVisible = false;
-      this.constraintToDelete = {};
-      this.segmentToDelete = {};
-    },
-    confirmConstraintDeletion() {
-      Axios.delete(
-          `${API_URL}/flags/${this.flagId}/segments/${this.segmentToDelete.id}/constraints/${this.constraintToDelete.id}`
-      ).then(() => {
-        const index = this.segmentToDelete.constraints.findIndex(
-            c => c.id === this.constraintToDelete.id
-        );
-        this.segmentToDelete.constraints.splice(index, 1);
-        this.dialogDeleteConstraintVisible = false;
-        this.constraintToDelete = {};
-        this.segmentToDelete = {}
-        this.$message.success("constraint deleted");
-      }, handleErr.bind(this));
-    },
-    cloneSegment(segment) {
-      const errorHandler = handleErr.bind(this);
-      // create segment first
-      Axios.post(
-        `${API_URL}/flags/${this.flagId}/segments`,
-        {
-          description: `${segment.description} (Clone)`,
-          rolloutPercent: segment.rolloutPercent,
-        }
-      ).then(response => {
-        let newSegment = response.data;
-        // clone distribution
-        const distributions = segment.distributions.map(({ percent, variantID, variantKey }) => ({ percent, variantID, variantKey }));
-        this.putDistributions(newSegment.id, distributions).then(async () => {
-          // clone constraints sequentially to preserve order
-          for (const constraint of segment.constraints) {
-            await this.postConstraint(newSegment.id, constraint);
-          }
-          this.$message.success('Segment successfully cloned')
-          // Re fetch flag to update state
-          this.fetchFlag();
-        }, errorHandler);
-      }, errorHandler);
-    },
-    segmentUp(segment, segments) {
-      const segmentIndex = segments.findIndex(s => s.id === segment.id);
-
-      if (segmentIndex < 1)
-        return;
-
-      segments.splice(segmentIndex - 1, 0, segments.splice(segmentIndex, 1)[0]);
-    },
-    segmentDown(segment, segments) {
-      const segmentIndex = segments.findIndex(s => s.id === segment.id);
-
-      if (segmentIndex > segments.length - 1)
-        return;
-
-      segments.splice(segmentIndex + 1, 0, segments.splice(segmentIndex, 1)[0]);
-    },
-    deleteSegment(segment) {
-      this.dialogDeleteSegmentVisible = true;
-      this.segmentToDelete = segment;
-    },
-    cancelSegmentDeletion() {
-      this.dialogDeleteSegmentVisible = false;
-      this.segmentToDelete = {};
-    },
-    confirmSegmentDeletion() {
-      Axios.delete(
-          `${API_URL}/flags/${this.flagId}/segments/${this.segmentToDelete.id}`
-      ).then(() => {
-        const index = this.flag.segments.findIndex(el => el.id === this.segmentToDelete.id);
-        this.flag.segments.splice(index, 1);
-        this.dialogDeleteSegmentVisible = false;
-        this.segmentToDelete = {};
-        this.$message.success("segment deleted");
-      }, handleErr.bind(this));
-    },
-    createSegment() {
-      Axios.post(
-        `${API_URL}/flags/${this.flagId}/segments`,
-        this.newSegment
-      ).then(response => {
-        let segment = response.data;
-        processSegment(segment);
-        segment.constraints = [];
-        if (this.flag.variants.length) {
-          // default the first variant to 100%
-          this.setDistributionValue(100, segment, this.flag.variants[0]);
-        }
-        this.newSegment = clone(DEFAULT_SEGMENT);
-        this.flag.segments.push(segment);
-        this.$message.success("new segment created");
-        this.dialogCreateSegmentOpen = false;
-      }, handleErr.bind(this));
-    },
-    putDistributions(segmentId, distributions) {
-      return Axios.put(
-        `${API_URL}/flags/${this.flagId}/segments/${segmentId}/distributions`,
-        { distributions },
-      ).catch(handleErr.bind(this));
-    },
     loadFlagData() {
       this.fetchFlag();
       this.loadAllTags();
     },
     formatConstraint(constraint) {
-      if (constraint.operator === "IN" || constraint.operator === "NIN") {
-        constraint.value = constraint.value.split(",").map(this.quoteString).join(",");
-        if (!constraint.value.match(/\[/)) {
-          constraint.value = `[${constraint.value}`;
-        }
-        if (!constraint.value.match(/\]/)) {
-          constraint.value = `${constraint.value}]`;
-        }
-      } else {
-        constraint.value = this.quoteString(constraint.value);
-      }
-      return constraint;
+      return ConstraintService.formatConstraint(constraint);
     },
     fetchFlag() {
       Axios.get(`${API_URL}/flags/${this.flagId}`).then(response => {
@@ -919,9 +426,6 @@ export default {
         this.loaded = true;
       }, handleErr.bind(this));
       this.fetchEntityTypes();
-    },
-    listConstraint(constraint) {
-      return ["IN", "NOTIN"].includes(constraint.operator);
     },
     fetchEntityTypes() {
       function prepareEntityTypes(entityTypes) {
@@ -952,42 +456,6 @@ export default {
     toggleShowMdEditor() {
       this.showMdEditor = !this.showMdEditor;
     },
-    sumDistributions(distributions) {
-      return distributions.reduce((current, { percent }) => current + percent, 0);
-    },
-    getDistributionValue(segment, variant) {
-      const distribution = segment.distributions.find(d => d.variantID === variant.id);
-      return distribution ? distribution.percent : 0;
-    },
-    setDistributionValue(value, segment, variant) {
-      const percent = parseInt(value, 10);
-      console.log({ segment, variant, percent });
-      const distribution = segment.distributions.find(d => d.variantID === variant.id);
-      if (distribution) {
-        console.log("updating")
-        distribution.percent = percent;
-      } else {
-        console.log("adding")
-        const newDistribution = {
-          variantID: variant.id,
-          variantKey: variant.key,
-          percent,
-        };
-        segment.distributions.push(newDistribution);
-      }
-    },
-    quoteString(value) {
-      var sanitized = value.replace(/\[|\]/g, "");
-      if (sanitized.match(/[a-zA-z]+/)) {
-        if (!(sanitized.match(/^"/))) {
-          sanitized = `"${sanitized}`;
-        }
-        if (!(sanitized.match(/"$/))) {
-          sanitized = `${sanitized}"`;
-        }
-      }
-      return sanitized;
-    }
   },
   mounted() {
     this.loadFlagData();
